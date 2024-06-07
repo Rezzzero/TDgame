@@ -1,0 +1,10 @@
+.map {
+  display: grid;
+  grid-template-columns: repeat(20, 32px);
+  grid-template-rows: repeat(10, 32px);
+}
+
+.map-tile {
+  width: 32px;
+  height: 32px;
+}
