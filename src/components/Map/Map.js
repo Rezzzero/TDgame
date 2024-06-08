@@ -16,7 +16,7 @@ const generateMap = (width, height) => {
       let tile = tileTypes.water;
 
       //Создание участков земли
-      if (x > 4 && x < 15 && y > 4 && y < 15) {
+      if (x > 4 && x < 25 && y > 4 && y < 25) {
         tile = tileTypes.grass;
       }
 
@@ -38,8 +38,12 @@ const Map = ({ width, height }) => {
         {map.map((row, rowIndex) => (
           <div key={rowIndex} className="flex">
             {row.map((tile, tileIndex) => (
-              <div key={tileIndex} className="w-[32px] h-[32px]">
-                <img src={tile} alt="tile" />
+              <div key={tileIndex} className="w-[28px] h-[28px]">
+                <img
+                  src={tile}
+                  alt="tile"
+                  className="border border-2 border-black "
+                />
               </div>
             ))}
           </div>
