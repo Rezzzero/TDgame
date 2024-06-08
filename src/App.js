@@ -1,12 +1,14 @@
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import Map from "./components/Map/Map";
-import House from "./components/Structure/House/House";
 
 function App() {
   return (
     <div className="App container">
       <p>Набросок карты</p>
-      <Map width={30} height={30} />
-      <House />
+      <DndProvider backend={HTML5Backend}>
+        <Map width={30} height={30} />
+      </DndProvider>
     </div>
   );
 }
