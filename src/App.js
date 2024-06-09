@@ -1,7 +1,20 @@
 import House from "./components/Structure/House/House";
 import Map from "./components/Map/Map";
-
+import socket from "./socket.io";
+import { useEffect } from "react";
 function App() {
+  useEffect(() => {
+    socket.emit("message", "Hello from client!");
+
+    socket.on("message", (msg) => {
+      console.log("Received message from server:", msg);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   return (
     <div className="App container">
       <p>Набросок карты</p>
