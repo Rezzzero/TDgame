@@ -7,11 +7,11 @@ const socket = io("http://localhost:8080", {
 });
 
 socket.on("connect", () => {
-  console.log("connected");
+  console.log("Connected with socket ID:", socket.id);
 });
 
 socket.on("disconnect", () => {
-  console.log(socket.id); // undefined
+  console.log("User disconnected");
 });
 
 export default socket;

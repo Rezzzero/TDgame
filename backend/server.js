@@ -14,18 +14,15 @@ const io = new Server(httpServer, {
   },
 });
 
+app.use(express.static(path.join(__dirname, "../public")));
+
 io.on("connection", (socket) => {
   console.log("a user connected");
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
-  socket.on("message", (msg) => {
-    console.log("message: " + msg);
-    socket.broadcast.emit("message", msg);
-  });
 });
-
-app.use(express.static(path.join(__dirname, "../public")));
 
 httpServer.listen(8080, () => {
   console.log("listening on port 8080");

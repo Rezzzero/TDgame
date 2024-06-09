@@ -10,9 +10,7 @@ function App() {
       console.log("Received message from server:", msg);
     });
 
-    return () => {
-      socket.disconnect();
-    };
+    if (socket === undefined) return () => socket.disconnect();
   }, []);
 
   return (
