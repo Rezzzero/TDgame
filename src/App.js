@@ -1,6 +1,6 @@
-import House from "./components/Structure/House/House";
-import Map from "./components/Map/Map";
-import socket from "./socket.io";
+import House from "./components/Structure/House/House.js";
+import Map from "./components/Map/Map.js";
+import socket from "./socket.io.js";
 import { useEffect, useState } from "react";
 function App() {
   const [connected, setConnected] = useState(false);

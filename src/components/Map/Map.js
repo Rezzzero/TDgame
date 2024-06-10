@@ -1,10 +1,5 @@
-import medievalTile_58 from "../../assets/tile/medievalTile_58.png";
-import medievalTile_27 from "../../assets/tile/medievalTile_27.png";
-
-const tileTypes = {
-  grass: medievalTile_58,
-  water: medievalTile_27,
-};
+import grass from "../../assets/tile/medievalTile_58.png";
+import water from "../../assets/tile/medievalTile_27.png";
 
 const generateMap = (width, height) => {
   const map = [];
@@ -12,11 +7,11 @@ const generateMap = (width, height) => {
   for (let y = 0; y < height; y++) {
     const row = [];
     for (let x = 0; x < width; x++) {
-      let tile = tileTypes.water;
+      let tile = water;
 
       //Создание участков земли
       if (x > 4 && x < 25 && y > 4 && y < 25) {
-        tile = tileTypes.grass;
+        tile = grass;
       }
 
       row.push(tile);

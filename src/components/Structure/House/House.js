@@ -1,22 +1,18 @@
-import medievalStructure_17 from "../../../assets/structure/medievalStructure_17.png";
-import medievalStructure_18 from "../../../assets/structure/medievalStructure_18.png";
+import houseLvl2 from "../../../assets/structure/medievalStructure_17.png";
+import houseLvl1 from "../../../assets/structure/medievalStructure_18.png";
 import { useState } from "react";
-import Modal from "../../../shared/Modal/Modal";
+import Modal from "../../../shared/Modal/Modal.js";
 
-const structureTypes = {
-  houseLvl1: medievalStructure_18,
-  houseLvl2: medievalStructure_17,
-};
 const House = () => {
   const [openHouseInfo, setOpenHouseInfo] = useState(false);
-  const [currentHouse, setCurrentHouse] = useState(structureTypes.houseLvl1);
+  const [currentHouse, setCurrentHouse] = useState(houseLvl1);
   const handleOpenHouseInfo = () => {
     setOpenHouseInfo(!openHouseInfo);
   };
 
   const handleUpgrade = () => {
-    if (currentHouse === structureTypes.houseLvl1) {
-      setCurrentHouse(structureTypes.houseLvl2);
+    if (currentHouse === houseLvl1) {
+      setCurrentHouse(houseLvl2);
     }
     setOpenHouseInfo(false);
   };
