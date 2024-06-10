@@ -17,7 +17,7 @@ function App() {
       }, 2000);
     });
 
-    if (socket === undefined) return () => socket.disconnect();
+    if (!socket) return () => socket.disconnect();
   }, []);
 
   return (
