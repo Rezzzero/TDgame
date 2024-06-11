@@ -2,6 +2,7 @@ import House from "../../components/Structure/House/House.js";
 import Map from "../../components/Map/Map.js";
 import connectSocket from "../../socket.io.js";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Game = () => {
   const [connected, setConnected] = useState(false);
@@ -12,7 +13,6 @@ const Game = () => {
     setSocket(socketInstance);
 
     socketInstance.on("connect", () => {
-      console.log("Connected with socket ID:", socketInstance.id);
       setConnected(true);
     });
 
@@ -33,6 +33,7 @@ const Game = () => {
   return (
     <>
       <p>Набросок карты</p>
+      <Link to="/">Покинуть игру</Link>
       <Map width={30} height={30} />
       {connected && <House />}
     </>
