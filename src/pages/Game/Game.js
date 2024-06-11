@@ -7,9 +7,11 @@ import { Link } from "react-router-dom";
 const Game = () => {
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [borderFirstHouse, setBorderFirstHouse] = useState("blue");
+  const [borderSecondHouse, setBorderSecondHouse] = useState("red");
 
   useEffect(() => {
-    const socketInstance = connectSocket(); // вызываем функцию для получения объекта сокета
+    const socketInstance = connectSocket();
     setSocket(socketInstance);
 
     socketInstance.on("connect", () => {
@@ -27,15 +29,22 @@ const Game = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.emit("message", "Hello from client!");
+      socket.on("houseColor", (color) => {
+        setBorderFirstHouse(color);
+      });
+      socket.on("houseColor2", (color) => {
+        setBorderSecondHouse(color);
+      });
     }
   }, [socket]);
+
   return (
     <>
       <p>Набросок карты</p>
       <Link to="/">Покинуть игру</Link>
       <Map width={30} height={30} />
-      {connected && <House />}
+      <House leftSide={true} border={borderFirstHouse} />
+      <House leftSide={false} border={borderSecondHouse} />
     </>
   );
 };

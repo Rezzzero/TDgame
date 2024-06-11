@@ -21,16 +21,30 @@ const io = new Server(httpServer, {
 
 app.use(express.static(path.join(__dirname, "../public")));
 
+const userColors = {};
+
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("message", (msg) => {
-    console.log("Received message:", msg);
-    socket.emit("message", "Hello from server!");
-  });
+  const userCount = io.engine.clientsCount;
+  let houseColor, houseColor2;
+
+  if (userCount % 2 === 1) {
+    houseColor = "blue";
+    houseColor2 = "red";
+  } else {
+    houseColor = "red";
+    houseColor2 = "blue";
+  }
+
+  userColors[socket.id] = { houseColor, houseColor2 };
+
+  socket.emit("houseColor", userColors[socket.id].houseColor);
+  socket.emit("houseColor2", userColors[socket.id].houseColor2);
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
+    delete userColors[socket.id];
   });
 });
 
