@@ -16,18 +16,24 @@ const io = new Server(httpServer, {
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
+  path: "/socket.io",
 });
 
 app.use(express.static(path.join(__dirname, "../public")));
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  console.log("A user connected");
+
+  socket.on("message", (msg) => {
+    console.log("Received message:", msg);
+    socket.emit("message", "Hello from server!");
+  });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("User disconnected");
   });
 });
 
 httpServer.listen(8080, () => {
-  console.log("listening on port 8080");
+  console.log("Listening on port 8080");
 });
