@@ -33,16 +33,18 @@ app.get("/rooms", (req, res) => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("joinRoom", (gameId) => {
+  socket.on("joinRoom", ({ gameId, username }) => {
     socket.join(gameId);
 
     if (!rooms[gameId]) {
       rooms[gameId] = [];
     }
 
-    rooms[gameId].push(socket.id);
+    rooms[gameId].push({ id: socket.id, username });
 
     io.to(gameId).emit("updateUserList", rooms[gameId]);
+
+    console.log(`User joined room: ${gameId}, username: ${username}`);
 
     const userCount = rooms[gameId].length;
     let houseColor, houseColor2;
@@ -65,7 +67,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
       console.log("User disconnected");
 
-      rooms[gameId] = rooms[gameId].filter((id) => id !== socket.id);
+      rooms[gameId] = rooms[gameId].filter((user) => user.id !== socket.id);
 
       if (rooms[gameId].length === 0) {
         delete rooms[gameId];

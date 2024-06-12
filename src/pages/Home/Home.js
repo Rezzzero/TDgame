@@ -18,12 +18,26 @@ const Home = () => {
   }, []);
 
   function createGame() {
-    const name = prompt("Создать игру");
-    if (name) {
-      const gameId = encodeURIComponent(name);
-      navigate(`/game/${gameId}`);
-    }
+    const username = prompt("Введите ваш никнейм:");
+    if (!username) return;
+
+    const roomName = prompt("Введите название комнаты:");
+    if (!roomName) return;
+
+    localStorage.setItem("username", username);
+    const gameId = encodeURIComponent(roomName);
+    navigate(`/game/${gameId}`);
   }
+
+  const joinRoomWithUsername = (roomName) => {
+    const username = prompt("Введите ваш никнейм:");
+    if (!username) return;
+
+    localStorage.setItem("username", username);
+    const gameId = encodeURIComponent(roomName);
+    navigate(`/game/${gameId}`);
+  };
+
   return (
     <>
       <h1>Лобби</h1>
@@ -37,7 +51,9 @@ const Home = () => {
       <ul>
         {rooms.map((room) => (
           <li key={room}>
-            <Link to={`/game/${room}`}>{decodeURIComponent(room)}</Link>
+            <button onClick={() => joinRoomWithUsername(room)}>
+              комната: {decodeURIComponent(room)}
+            </button>
           </li>
         ))}
       </ul>

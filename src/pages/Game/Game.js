@@ -15,8 +15,11 @@ const Game = () => {
     const socketInstance = connectSocket();
     setSocket(socketInstance);
 
+    const username = localStorage.getItem("username");
+    if (!username) return;
+
     socketInstance.on("connect", () => {
-      socketInstance.emit("joinRoom", gameId);
+      socketInstance.emit("joinRoom", { gameId, username });
     });
 
     socketInstance.on("updateUserList", (userList) => {
@@ -26,7 +29,7 @@ const Game = () => {
     return () => {
       socketInstance.disconnect();
     };
-  }, []);
+  }, [gameId]);
 
   useEffect(() => {
     if (socket) {
@@ -50,7 +53,7 @@ const Game = () => {
         <h2>Подключенные пользователи:</h2>
         <ul>
           {users.map((user) => (
-            <li key={user}>{user}</li>
+            <li key={user.id}>{user.username}</li>
           ))}
         </ul>
       </div>
