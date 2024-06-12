@@ -3,6 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,32 +20,55 @@ const io = new Server(httpServer, {
   path: "/socket.io",
 });
 
+app.use(cors());
+
 app.use(express.static(path.join(__dirname, "../public")));
 
-const userColors = {};
+const rooms = {};
+
+app.get("/rooms", (req, res) => {
+  res.json(Object.keys(rooms));
+});
 
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  const userCount = io.engine.clientsCount;
-  let houseColor, houseColor2;
+  socket.on("joinRoom", (gameId) => {
+    socket.join(gameId);
 
-  if (userCount % 2 === 1) {
-    houseColor = "blue";
-    houseColor2 = "red";
-  } else {
-    houseColor = "red";
-    houseColor2 = "blue";
-  }
+    if (!rooms[gameId]) {
+      rooms[gameId] = 0;
+    }
 
-  userColors[socket.id] = { houseColor, houseColor2 };
+    rooms[gameId]++;
 
-  socket.emit("houseColor", userColors[socket.id].houseColor);
-  socket.emit("houseColor2", userColors[socket.id].houseColor2);
+    const userCount = rooms[gameId];
+    let houseColor, houseColor2;
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-    delete userColors[socket.id];
+    if (userCount % 2 === 1) {
+      houseColor = "blue";
+      houseColor2 = "red";
+    } else {
+      houseColor = "red";
+      houseColor2 = "blue";
+    }
+
+    socket.emit("houseColor", houseColor);
+    socket.emit("houseColor2", houseColor2);
+
+    console.log(
+      `User joined room: ${gameId}, current user count: ${userCount}`
+    );
+
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
+
+      rooms[gameId]--;
+
+      if (rooms[gameId] === 0) {
+        delete rooms[gameId];
+      }
+    });
   });
 });
 

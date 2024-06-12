@@ -1,4 +1,4 @@
 export const Route = {
   HOME: "/",
-  GAME: "/game",
+  GAME: "/game/:gameId",
 };

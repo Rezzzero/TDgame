@@ -2,9 +2,10 @@ import House from "../../components/Structure/House/House.js";
 import Map from "../../components/Map/Map.js";
 import connectSocket from "../../socket.io.js";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const Game = () => {
+  const { gameId } = useParams();
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);
   const [borderFirstHouse, setBorderFirstHouse] = useState("blue");
@@ -16,6 +17,7 @@ const Game = () => {
 
     socketInstance.on("connect", () => {
       setConnected(true);
+      socketInstance.emit("joinRoom", gameId);
     });
 
     socketInstance.on("message", (msg) => {
