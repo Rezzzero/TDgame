@@ -37,12 +37,14 @@ io.on("connection", (socket) => {
     socket.join(gameId);
 
     if (!rooms[gameId]) {
-      rooms[gameId] = 0;
+      rooms[gameId] = [];
     }
 
-    rooms[gameId]++;
+    rooms[gameId].push(socket.id);
 
-    const userCount = rooms[gameId];
+    io.to(gameId).emit("updateUserList", rooms[gameId]);
+
+    const userCount = rooms[gameId].length;
     let houseColor, houseColor2;
 
     if (userCount % 2 === 1) {
@@ -63,10 +65,12 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
       console.log("User disconnected");
 
-      rooms[gameId]--;
+      rooms[gameId] = rooms[gameId].filter((id) => id !== socket.id);
 
-      if (rooms[gameId] === 0) {
+      if (rooms[gameId].length === 0) {
         delete rooms[gameId];
+      } else {
+        io.to(gameId).emit("updateUserList", rooms[gameId]);
       }
     });
   });

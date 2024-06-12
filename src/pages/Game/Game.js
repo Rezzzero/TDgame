@@ -6,22 +6,21 @@ import { Link, useParams } from "react-router-dom";
 
 const Game = () => {
   const { gameId } = useParams();
-  const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);
   const [borderFirstHouse, setBorderFirstHouse] = useState("blue");
   const [borderSecondHouse, setBorderSecondHouse] = useState("red");
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const socketInstance = connectSocket();
     setSocket(socketInstance);
 
     socketInstance.on("connect", () => {
-      setConnected(true);
       socketInstance.emit("joinRoom", gameId);
     });
 
-    socketInstance.on("message", (msg) => {
-      console.log("Received message from server:", msg);
+    socketInstance.on("updateUserList", (userList) => {
+      setUsers(userList);
     });
 
     return () => {
@@ -47,6 +46,14 @@ const Game = () => {
       <Map width={30} height={30} />
       <House leftSide={true} border={borderFirstHouse} />
       <House leftSide={false} border={borderSecondHouse} />
+      <div>
+        <h2>Подключенные пользователи:</h2>
+        <ul>
+          {users.map((user) => (
+            <li key={user}>{user}</li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 };
