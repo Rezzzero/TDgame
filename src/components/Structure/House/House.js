@@ -23,7 +23,9 @@ const House = ({ level, index, houseColor, onUpgrade }) => {
   const [openHouseInfo, setOpenHouseInfo] = useState(false);
 
   const handleOpenHouseInfo = () => {
-    setOpenHouseInfo(!openHouseInfo);
+    if (houseImage === houseBlueLvl1) {
+      setOpenHouseInfo(!openHouseInfo);
+    }
   };
 
   return (

@@ -52,7 +52,7 @@ io.on("connection", (socket) => {
 
     io.to(gameId).emit("updateUserList", rooms[gameId]);
 
-    socket.emit("houseColor", houseColor);
+    socket.emit("houseColor", user.houseColor);
 
     socket.on("disconnect", () => {
       console.log("User disconnected");
