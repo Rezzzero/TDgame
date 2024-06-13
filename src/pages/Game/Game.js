@@ -1,4 +1,3 @@
-import House from "../../components/Structure/House/House.js";
 import Map from "../../components/Map/Map.js";
 import connectSocket from "../../socket.io.js";
 import { useEffect, useState } from "react";
@@ -47,8 +46,6 @@ const Game = () => {
       <p>Набросок карты</p>
       <Link to="/">Покинуть игру</Link>
       <Map width={30} height={30} />
-      <House leftSide={true} border={borderFirstHouse} />
-      <House leftSide={false} border={borderSecondHouse} />
       <div>
         <h2>Подключенные пользователи:</h2>
         <ul>

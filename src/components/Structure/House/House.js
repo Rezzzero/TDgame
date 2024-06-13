@@ -1,44 +1,43 @@
 import houseLvl2 from "../../../assets/structure/medievalStructure_17.png";
 import houseLvl1 from "../../../assets/structure/medievalStructure_18.png";
+import houseBlueLvl1 from "../../../assets/structure/medievalStructureBlue_18.png";
+import houseRedLvl1 from "../../../assets/structure/medievalStructureRed_18.png";
 import { useState } from "react";
 import Modal from "../../../shared/Modal/Modal.js";
 
-const House = ({ leftSide, border }) => {
-  const [openHouseInfo, setOpenHouseInfo] = useState(false);
-  const [currentHouse, setCurrentHouse] = useState(houseLvl1);
-  const handleOpenHouseInfo = () => {
-    setOpenHouseInfo(!openHouseInfo);
+const House = ({ level, index, onUpgrade }) => {
+  const houseImages = {
+    1: houseLvl1,
+    2: houseLvl2,
   };
 
-  const handleUpgrade = () => {
-    if (currentHouse === houseLvl1) {
-      setCurrentHouse(houseLvl2);
-    }
-    setOpenHouseInfo(false);
+  let houseImage;
+  if (index.x === 3 && index.y === 2) {
+    houseImage = houseBlueLvl1;
+  } else if (index.x === 25 && index.y === 24) {
+    houseImage = houseRedLvl1;
+  } else {
+    houseImage = houseImages[level];
+  }
+
+  const [openHouseInfo, setOpenHouseInfo] = useState(false);
+
+  const handleOpenHouseInfo = () => {
+    setOpenHouseInfo(!openHouseInfo);
   };
 
   return (
     <>
       <div
-        onClick={() => handleOpenHouseInfo()}
-        className={`w-[100px] h-[100px] absolute ${
-          leftSide ? "top-[65%] left-[39%]" : "top-[27%] right-[37%]"
-        } ${
-          border === "blue"
-            ? "border-b-2 border-blue-500"
-            : "border-b-2 border-red-500"
-        } z-10 cursor-pointer`}
+        onClick={handleOpenHouseInfo}
+        className="w-[50px] h-[50px] absolute z-10 cursor-pointer hover:scale-110 duration-300"
       >
-        <img
-          src={currentHouse}
-          alt="house"
-          className="transition-transform duration-300 ease-in-out hover:scale-110"
-        />
+        <img src={houseImage} alt="house" className="w-full h-full" />
       </div>
       {openHouseInfo && (
         <Modal
           handleOpenHouseInfo={handleOpenHouseInfo}
-          upgradeMain={handleUpgrade}
+          upgradeMain={onUpgrade}
         >
           <h2 className="text-xl mb-4">House Information</h2>
           <p>Some information about the house...</p>
