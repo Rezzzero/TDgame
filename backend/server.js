@@ -40,29 +40,19 @@ io.on("connection", (socket) => {
       rooms[gameId] = [];
     }
 
-    rooms[gameId].push({ id: socket.id, username });
+    const user = { id: socket.id, username, houseColor: "red" };
+
+    if (rooms[gameId].length === 0) {
+      user.houseColor = "blue";
+    } else if (rooms[gameId].length === 1) {
+      user.houseColor = "red";
+    }
+
+    rooms[gameId].push(user);
 
     io.to(gameId).emit("updateUserList", rooms[gameId]);
 
-    console.log(`User joined room: ${gameId}, username: ${username}`);
-
-    const userCount = rooms[gameId].length;
-    let houseColor, houseColor2;
-
-    if (userCount % 2 === 1) {
-      houseColor = "blue";
-      houseColor2 = "red";
-    } else {
-      houseColor = "red";
-      houseColor2 = "blue";
-    }
-
     socket.emit("houseColor", houseColor);
-    socket.emit("houseColor2", houseColor2);
-
-    console.log(
-      `User joined room: ${gameId}, current user count: ${userCount}`
-    );
 
     socket.on("disconnect", () => {
       console.log("User disconnected");

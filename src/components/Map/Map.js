@@ -22,7 +22,7 @@ const generateMap = (width, height) => {
   return map;
 };
 
-const Map = ({ width, height }) => {
+const Map = ({ width, height, houseColor }) => {
   const [map, setMap] = useState(generateMap(width, height));
 
   const handleUpgrade = (x, y) => {
@@ -52,6 +52,7 @@ const Map = ({ width, height }) => {
                   <House
                     level={tile.structure.level}
                     index={{ x: tileIndex, y: rowIndex }}
+                    houseColor={houseColor}
                     onUpgrade={() => handleUpgrade(tileIndex, rowIndex)}
                   />
                 )}

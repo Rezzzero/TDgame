@@ -5,7 +5,7 @@ import houseRedLvl1 from "../../../assets/structure/medievalStructureRed_18.png"
 import { useState } from "react";
 import Modal from "../../../shared/Modal/Modal.js";
 
-const House = ({ level, index, onUpgrade }) => {
+const House = ({ level, index, houseColor, onUpgrade }) => {
   const houseImages = {
     1: houseLvl1,
     2: houseLvl2,
@@ -13,9 +13,9 @@ const House = ({ level, index, onUpgrade }) => {
 
   let houseImage;
   if (index.x === 3 && index.y === 2) {
-    houseImage = houseBlueLvl1;
+    houseImage = houseColor === "blue" ? houseBlueLvl1 : houseRedLvl1;
   } else if (index.x === 25 && index.y === 24) {
-    houseImage = houseRedLvl1;
+    houseImage = houseColor === "blue" ? houseRedLvl1 : houseBlueLvl1;
   } else {
     houseImage = houseImages[level];
   }

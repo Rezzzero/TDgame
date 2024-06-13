@@ -6,9 +6,8 @@ import { Link, useParams } from "react-router-dom";
 const Game = () => {
   const { gameId } = useParams();
   const [socket, setSocket] = useState(null);
-  const [borderFirstHouse, setBorderFirstHouse] = useState("blue");
-  const [borderSecondHouse, setBorderSecondHouse] = useState("red");
   const [users, setUsers] = useState([]);
+  const [houseColor, setHouseColor] = useState(null);
 
   useEffect(() => {
     const socketInstance = connectSocket();
@@ -25,27 +24,21 @@ const Game = () => {
       setUsers(userList);
     });
 
+    socketInstance.on("houseColor", (houseColor) => {
+      console.log("Received house color:", houseColor);
+      setHouseColor(houseColor);
+    });
+
     return () => {
       socketInstance.disconnect();
     };
   }, [gameId]);
 
-  useEffect(() => {
-    if (socket) {
-      socket.on("houseColor", (color) => {
-        setBorderFirstHouse(color);
-      });
-      socket.on("houseColor2", (color) => {
-        setBorderSecondHouse(color);
-      });
-    }
-  }, [socket]);
-
   return (
     <>
       <p>Набросок карты</p>
       <Link to="/">Покинуть игру</Link>
-      <Map width={30} height={30} />
+      <Map width={30} height={30} houseColor={houseColor} />
       <div>
         <h2>Подключенные пользователи:</h2>
         <ul>
