@@ -1,29 +1,9 @@
 import { useState } from "react";
-import grass from "../../assets/tile/medievalTile_58.png";
 import House from "../Structure/House/House.js";
-
-const generateMap = (width, height) => {
-  const map = [];
-
-  for (let y = 0; y < height; y++) {
-    const row = [];
-    for (let x = 0; x < width; x++) {
-      let tile = grass;
-
-      row.push({ type: tile, structure: null });
-    }
-
-    map.push(row);
-  }
-
-  map[2][3].structure = { type: "house", level: 1 };
-  map[height - 6][width - 5].structure = { type: "house", level: 1 };
-
-  return map;
-};
+import generateMap from "../../utils/MapUtils/mapUtils.js";
 
 const Map = ({ width, height, houseColor }) => {
-  const [map, setMap] = useState(generateMap(width, height));
+  const [map, setMap] = useState(() => generateMap(width, height));
 
   const handleUpgrade = (x, y) => {
     const newMap = map.map((row, rowIndex) => {
@@ -45,7 +25,7 @@ const Map = ({ width, height, houseColor }) => {
             {row.map((tile, tileIndex) => (
               <div
                 key={tileIndex}
-                className="w-[28px] h-[28px] relative border border-2 border-black"
+                className="w-[28px] h-[28px] relative border-2 border-black"
               >
                 <img src={tile.type} alt="tile" className="w-full h-full" />
                 {tile.structure && tile.structure.type === "house" && (
