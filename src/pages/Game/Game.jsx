@@ -1,4 +1,4 @@
-import Map from "../../components/Map/Map.jsx";
+import Map from "../../features/Map/Map.jsx";
 import connectSocket from "../../socket.io.js";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";

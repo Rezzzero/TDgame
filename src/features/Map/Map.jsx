@@ -1,5 +1,5 @@
 import { useState } from "react";
-import House from "../Structure/House/House.jsx";
+import House from "../../entities/House/House.jsx";
 import generateMap from "../../shared/MapUtils/mapUtils.jsx";
 import React from "react";
 
