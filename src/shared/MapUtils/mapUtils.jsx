@@ -1,6 +1,6 @@
-import grass from "../../assets/tile/medievalTile_58.png";
-import path from "../../assets/tile/medievalTile_13.png";
-import dirt from "../../assets/tile/medievalTile_14.png";
+import grass from "../../shared/assets/tile/medievalTile_58.png";
+import path from "../../shared/assets/tile/medievalTile_13.png";
+import dirt from "../../shared/assets/tile/medievalTile_14.png";
 
 const generateMap = (width, height) => {
   const map = Array.from({ length: height }, () =>

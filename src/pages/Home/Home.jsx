@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import React from "react";
 
 const Home = () => {
   const navigate = useNavigate();

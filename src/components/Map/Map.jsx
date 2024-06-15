@@ -1,6 +1,7 @@
 import { useState } from "react";
-import House from "../Structure/House/House.js";
-import generateMap from "../../utils/MapUtils/mapUtils.js";
+import House from "../Structure/House/House.jsx";
+import generateMap from "../../shared/MapUtils/mapUtils.jsx";
+import React from "react";
 
 const Map = ({ width, height, houseColor }) => {
   const [map, setMap] = useState(() => generateMap(width, height));

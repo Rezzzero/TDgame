@@ -1,7 +1,8 @@
-import Map from "../../components/Map/Map.js";
+import Map from "../../components/Map/Map.jsx";
 import connectSocket from "../../socket.io.js";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import React from "react";
 
 const Game = () => {
   const { gameId } = useParams();

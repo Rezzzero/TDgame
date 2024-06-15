@@ -1,9 +1,10 @@
-import houseLvl2 from "../../../assets/structure/medievalStructure_17.png";
-import houseLvl1 from "../../../assets/structure/medievalStructure_18.png";
-import houseBlueLvl1 from "../../../assets/structure/medievalStructureBlue_18.png";
-import houseRedLvl1 from "../../../assets/structure/medievalStructureRed_18.png";
+import houseLvl2 from "../../../shared/assets/structure/medievalStructure_17.png";
+import houseLvl1 from "../../../shared/assets/structure/medievalStructure_18.png";
+import houseBlueLvl1 from "../../../shared/assets/structure/medievalStructureBlue_18.png";
+import houseRedLvl1 from "../../../shared/assets/structure/medievalStructureRed_18.png";
 import { useState } from "react";
-import Modal from "../../../shared/Modal/Modal.js";
+import Modal from "../../../shared/Modal/Modal.jsx";
+import React from "react";
 
 const House = ({ level, index, houseColor, onUpgrade }) => {
   const houseImages = {
