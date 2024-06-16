@@ -36,7 +36,7 @@ const PixiMap = () => {
           container.addChild(grassSprite);
         }
       }
-
+      //функция для создания области вокруг дома
       const createDirtArea = (startX, startY, size) => {
         for (let row = startY; row < startY + size; row++) {
           for (let col = startX; col < startX + size; col++) {
@@ -52,6 +52,7 @@ const PixiMap = () => {
 
       const secondDirtStartX = mapWidth - 4 - 3;
       const secondDirtStartY = mapHeight - 4 - 3;
+      //два вызова функции для создания области вокруг левого верхнего и правого нижнего домов
       createDirtArea(3, 3, 4);
       createDirtArea(secondDirtStartX, secondDirtStartY, 4);
 
