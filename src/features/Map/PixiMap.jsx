@@ -50,11 +50,79 @@ const PixiMap = () => {
         }
       };
 
+      const firstDirtStartX = 3;
+      const firstDirtStartY = 3;
+
       const secondDirtStartX = mapWidth - 4 - 3;
       const secondDirtStartY = mapHeight - 4 - 3;
       //два вызова функции для создания области вокруг левого верхнего и правого нижнего домов
-      createDirtArea(3, 3, 4);
+      createDirtArea(firstDirtStartX, firstDirtStartY, 4);
       createDirtArea(secondDirtStartX, secondDirtStartY, 4);
+
+      const drawPath = (startX, startY, endX, endY) => {
+        let currentX = startX;
+        let currentY = startY;
+
+        while (currentX !== endX || currentY !== endY) {
+          if (currentX < endX) {
+            currentX++;
+          } else if (currentX > endX) {
+            currentX--;
+          }
+
+          if (currentY < endY) {
+            currentY++;
+          } else if (currentY > endY) {
+            currentY--;
+          }
+
+          // Отрисовка тайла dirt в текущей позиции
+          const dirtSprite = new Sprite(dirtTexture);
+          dirtSprite.width = tileWidth;
+          dirtSprite.height = tileHeight;
+          dirtSprite.x = currentX * tileWidth;
+          dirtSprite.y = currentY * tileHeight;
+          container.addChild(dirtSprite);
+        }
+      };
+
+      // Вызываем функцию для отрисовки пути между двумя участками
+      drawPath(
+        firstDirtStartX,
+        firstDirtStartY,
+        secondDirtStartX,
+        secondDirtStartY
+      );
+
+      //функция для создания боковых путей
+      const drawSidePaths = (startX, startY, endX, endY) => {
+        const createPathSprite = (x, y) => {
+          const pathSprite = new Sprite(pathTexture);
+          pathSprite.width = tileWidth;
+          pathSprite.height = tileHeight;
+          pathSprite.x = x * tileWidth;
+          pathSprite.y = y * tileHeight;
+          container.addChild(pathSprite);
+        };
+
+        for (let y = startY; y <= endY; y++) {
+          createPathSprite(startX, y);
+          createPathSprite(endX, y);
+        }
+
+        for (let x = startX; x <= endX; x++) {
+          createPathSprite(x, startY);
+          createPathSprite(x, endY);
+        }
+      };
+
+      // Вызываем функцию для отрисовки пути между двумя участками
+      drawSidePaths(
+        firstDirtStartX,
+        firstDirtStartY,
+        secondDirtStartX + 3,
+        secondDirtStartY + 3
+      );
 
       container.position.set(
         (app.screen.width - mapWidth * tileWidth) / 2,
