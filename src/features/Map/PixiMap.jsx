@@ -60,6 +60,16 @@ const PixiMap = () => {
       createDirtArea(secondDirtStartX, secondDirtStartY, 4);
 
       const drawPath = (startX, startY, endX, endY) => {
+        //функция для создания спрайта
+        const addDirtSprite = (x, y) => {
+          const dirtSprite = new Sprite(dirtTexture);
+          dirtSprite.width = tileWidth;
+          dirtSprite.height = tileHeight;
+          dirtSprite.x = x * tileWidth;
+          dirtSprite.y = y * tileHeight;
+          container.addChild(dirtSprite);
+        };
+
         let currentX = startX;
         let currentY = startY;
 
@@ -76,17 +86,13 @@ const PixiMap = () => {
             currentY--;
           }
 
-          // Отрисовка тайла dirt в текущей позиции
-          const dirtSprite = new Sprite(dirtTexture);
-          dirtSprite.width = tileWidth;
-          dirtSprite.height = tileHeight;
-          dirtSprite.x = currentX * tileWidth;
-          dirtSprite.y = currentY * tileHeight;
-          container.addChild(dirtSprite);
+          addDirtSprite(currentX, currentY); //отрисовка главного пути
+          addDirtSprite(currentX + 1, currentY); //добавление спрайта справа от главного пути
+          addDirtSprite(currentX, currentY + 1); //добавление спрайта под гланым путем
         }
       };
 
-      // Вызываем функцию для отрисовки пути между двумя участками
+      // Вызываем функцию для отрисовки главного пути между двумя участками
       drawPath(
         firstDirtStartX,
         firstDirtStartY,
