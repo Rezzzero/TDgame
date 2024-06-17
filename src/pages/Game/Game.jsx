@@ -38,11 +38,11 @@ const Game = () => {
 
   return (
     <>
-      <p>Набросок карты</p>
-      <Link to="/">Покинуть игру</Link>
       <PixiMap />
       {/* <Map width={30} height={30} houseColor={houseColor} /> */}
-      <div>
+      <div className="text-white absolute top-0 left-0">
+        <p>Набросок карты</p>
+        <Link to="/">Покинуть игру</Link>
         <h2>Подключенные пользователи:</h2>
         <ul>
           {users.map((user) => (
