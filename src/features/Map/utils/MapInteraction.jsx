@@ -1,21 +1,9 @@
 import { Graphics } from "pixi.js";
 
-export const addMask = (
-  app,
-  container,
-  screenWidth,
-  screenHeight,
-  mapWidth,
-  mapHeight,
-  tileWidth,
-  tileHeight
-) => {
-  const mask = new Graphics();
-  mask.beginFill(0x000000);
-  mask.drawRect(0, 0, screenWidth, screenHeight);
-  mask.endFill();
-  container.mask = mask;
-  app.stage.addChild(mask);
+export const addMask = (app, container, screenWidth, screenHeight) => {
+  const obj = new Graphics().rect(0, 0, screenWidth, screenHeight);
+  container.obj = obj;
+  app.stage.addChild(obj);
 };
 
 export const setupDragListeners = (

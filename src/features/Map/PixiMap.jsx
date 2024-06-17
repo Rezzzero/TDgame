@@ -93,16 +93,7 @@ const PixiMap = () => {
       );
 
       // Добавление маски и передвижения по карте
-      addMask(
-        app,
-        container,
-        screenWidth,
-        screenHeight,
-        mapWidth,
-        mapHeight,
-        tileWidth,
-        tileHeight
-      );
+      addMask(app, container, screenWidth, screenHeight);
       setupDragListeners(
         app,
         container,
