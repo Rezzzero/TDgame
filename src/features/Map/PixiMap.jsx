@@ -52,15 +52,15 @@ const PixiMap = () => {
       const secondDirtStartY = mapHeight - 4 - 3;
 
       //два вызова функции отрисовки участков домов
-      createDirtArea(container, dirtTexture, tileWidth, tileHeight, 3, 3, 4);
+      createDirtArea(container, dirtTexture, tileWidth, tileHeight, 3, 3, 8);
       createDirtArea(
         container,
         dirtTexture,
         tileWidth,
         tileHeight,
-        secondDirtStartX,
-        secondDirtStartY,
-        4
+        secondDirtStartX - 4,
+        secondDirtStartY - 4,
+        8
       );
 
       //функция для создания главной пути
@@ -86,6 +86,27 @@ const PixiMap = () => {
         secondDirtStartX + 3,
         secondDirtStartY + 3
       );
+
+      drawMainPath(
+        container,
+        dirtTexture,
+        tileWidth,
+        tileHeight,
+        2,
+        mapHeight / 2,
+        mapWidth - 5,
+        mapHeight / 2
+      ); // Горизонтальный путь по середине
+      drawMainPath(
+        container,
+        dirtTexture,
+        tileWidth,
+        tileHeight,
+        mapWidth / 2,
+        2,
+        mapWidth / 2,
+        mapHeight - 5
+      ); // Вертикальный путь по середине
 
       container.position.set(
         (screenWidth - mapWidth * tileWidth) / 2,

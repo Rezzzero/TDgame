@@ -40,14 +40,30 @@ const createSidePathSprites = (
     container.addChild(pathSprite);
   };
 
+  // Добавляем вертикальные пути
   for (let y = startY; y <= endY; y++) {
-    addPathSprite(startX, y);
-    addPathSprite(endX, y);
+    for (let xOffset = 0; xOffset < 2; xOffset++) {
+      if (startX > endX) {
+        addPathSprite(startX - xOffset, y);
+        addPathSprite(endX + xOffset, y);
+      } else {
+        addPathSprite(startX + xOffset, y);
+        addPathSprite(endX - xOffset, y);
+      }
+    }
   }
 
-  for (let x = startX + 1; x < endX; x++) {
-    addPathSprite(x, startY);
-    addPathSprite(x, endY);
+  // Добавляем горизонтальные пути
+  for (let x = startX; x <= endX; x++) {
+    for (let yOffset = 0; yOffset < 2; yOffset++) {
+      if (startY > endY) {
+        addPathSprite(x, startY - yOffset);
+        addPathSprite(x, endY + yOffset);
+      } else {
+        addPathSprite(x, startY + yOffset);
+        addPathSprite(x, endY - yOffset);
+      }
+    }
   }
 };
 
