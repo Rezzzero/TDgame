@@ -11,7 +11,6 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "http": "0.0.1-security",
-    "pixi.js": "^8.1.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",

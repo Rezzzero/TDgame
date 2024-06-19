@@ -3,7 +3,7 @@ import connectSocket from "../../socket.io.js";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import React from "react";
-import PixiMap from "@features/Map/PixiMap.jsx";
+import MapRender from "@features/Map/MapRender.jsx";
 
 const Game = () => {
   const { gameId } = useParams();
@@ -38,8 +38,8 @@ const Game = () => {
 
   return (
     <>
-      <PixiMap />
       {/* <Map width={30} height={30} houseColor={houseColor} /> */}
+      <MapRender />
       <div className="text-white absolute top-0 left-0">
         <p>Набросок карты</p>
         <Link to="/">Покинуть игру</Link>
