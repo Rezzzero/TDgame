@@ -17,9 +17,9 @@ const MapRender = () => {
     };
 
     const enemies = [
-      createEnemy(600, 200, waypoints1),
-      createEnemy(600, 200, waypoints2),
-      createEnemy(600, 200, waypoints1),
+      createEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1),
+      createEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2),
+      createEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1),
     ];
 
     function animate() {
