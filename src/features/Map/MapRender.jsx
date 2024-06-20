@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import gameMap from "@shared/assets/map/gameMap.png";
 import createEnemy from "@shared/lib/enemy.jsx";
+import { waypoints1, waypoints2 } from "@shared/data/paths.jsx";
 
 const MapRender = () => {
   const canvasRef = useRef(null);
@@ -16,9 +17,9 @@ const MapRender = () => {
     };
 
     const enemies = [
-      createEnemy(600, 200, 1),
-      createEnemy(600, 200, 1.5),
-      createEnemy(600, 200, 2),
+      createEnemy(600, 200, waypoints1),
+      createEnemy(600, 200, waypoints2),
+      createEnemy(600, 200, waypoints1),
     ];
 
     function animate() {

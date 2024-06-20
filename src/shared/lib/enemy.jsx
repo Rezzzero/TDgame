@@ -1,9 +1,15 @@
-const createEnemy = (initialX, initialY, speed) => {
+const createEnemy = (initialX, initialY, waypoints) => {
   let x = initialX;
   let y = initialY;
 
   const update = () => {
-    y += speed;
+    const waypoint = waypoints[0];
+    const yDistance = waypoint.y - y;
+    const xDistance = waypoint.x - x;
+    const angle = Math.atan2(yDistance, xDistance);
+
+    x += Math.cos(angle);
+    y += Math.sin(angle);
   };
 
   const draw = (ctx) => {

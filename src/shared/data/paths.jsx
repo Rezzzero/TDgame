@@ -1,4 +1,4 @@
-const waypoints1 = [
+export const waypoints1 = [
   {
     x: 0,
     y: 0,
@@ -45,7 +45,7 @@ const waypoints1 = [
   },
 ];
 
-const waypoints2 = [
+export const waypoints2 = [
   {
     x: 0,
     y: 0,
@@ -91,5 +91,3 @@ const waypoints2 = [
     y: 222.633837813418,
   },
 ];
-
-export default { waypoints1, waypoints2 };
