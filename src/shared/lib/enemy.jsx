@@ -1,4 +1,4 @@
-const createEnemy = (initialX, initialY, waypoints) => {
+const createEnemy = (initialX, initialY, waypoints, speed) => {
   let x = initialX;
   let y = initialY;
   let width = 10;
@@ -15,8 +15,8 @@ const createEnemy = (initialX, initialY, waypoints) => {
     const xDistance = waypoint.x - center.x;
     const angle = Math.atan2(yDistance, xDistance);
 
-    x += Math.cos(angle);
-    y += Math.sin(angle);
+    x += Math.cos(angle) * speed;
+    y += Math.sin(angle) * speed;
     center = {
       x: x + width / 2,
       y: y + height / 2,
