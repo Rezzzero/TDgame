@@ -16,11 +16,18 @@ const MapRender = () => {
       animate();
     };
 
-    const enemies = [
-      createEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1),
-      createEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2),
-      createEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1),
-    ];
+    const enemies = [];
+
+    for (let i = 1; i < 10; i++) {
+      const time = i * 500;
+      setTimeout(() => {
+        enemies.push(createEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1));
+      }, time);
+
+      setTimeout(() => {
+        enemies.push(createEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2));
+      }, time);
+    }
 
     function animate() {
       requestAnimationFrame(animate);
@@ -34,7 +41,7 @@ const MapRender = () => {
     }
   }, []);
 
-  return <canvas ref={canvasRef} width={1280} height={720} />;
+  return <canvas ref={canvasRef} width={1280} height={772} />;
 };
 
 export default MapRender;
