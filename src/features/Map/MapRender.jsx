@@ -1,10 +1,21 @@
 import React, { useRef, useEffect } from "react";
 import gameMap from "@shared/assets/map/gameMap.png";
 import createEnemy from "@shared/lib/enemy.jsx";
-import { waypoints1, waypoints2 } from "@shared/data/paths.jsx";
-
+import { waypoints1, waypoints2 } from "@shared/data/map/paths.jsx";
+import {
+  firstPlayerPlacementTilesData,
+  secondPlayerPlacementTilesData,
+} from "@shared/data/map/placementTilesData.jsx";
+import { GeneratePlacementTiles } from "./GeneratePlacementTiles";
 const MapRender = () => {
   const canvasRef = useRef(null);
+
+  const firstPlayerTiles = GeneratePlacementTiles(
+    firstPlayerPlacementTilesData
+  );
+  const secondPlayerTiles = GeneratePlacementTiles(
+    secondPlayerPlacementTilesData
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,10 +54,28 @@ const MapRender = () => {
         enemy.update();
         enemy.draw(ctx);
       });
+
+      firstPlayerTiles.forEach((tile) => {
+        tile.update(ctx, mouse);
+      });
+
+      secondPlayerTiles.forEach((tile) => {
+        tile.update(ctx, mouse);
+      });
     }
 
     requestAnimationFrame(animate);
   }, []);
+
+  const mouse = {
+    x: undefined,
+    y: undefined,
+  };
+
+  window.addEventListener("mousemove", (event) => {
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+  });
 
   return <canvas ref={canvasRef} width={1280} height={772} />;
 };
