@@ -1,6 +1,7 @@
 export const PlacementTile = (x, y) => {
   const size = 32;
   let color = "rgba(255, 255, 255, 0.3)";
+  let occupied = false;
 
   const draw = (ctx) => {
     ctx.fillStyle = color;
@@ -16,6 +17,9 @@ export const PlacementTile = (x, y) => {
       mouse.y < y + size
     ) {
       console.log("colliding");
+      color = "white";
+    } else {
+      color = "rgba(255, 255, 255, 0.3)";
     }
   };
 

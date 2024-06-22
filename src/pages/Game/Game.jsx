@@ -1,9 +1,9 @@
-import Map from "../../features/Map/Map.jsx";
+import Map from "@entities/Map/Map.jsx";
 import connectSocket from "../../socket.io.js";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import React from "react";
-import MapRender from "@features/Map/MapRender.jsx";
+import MapRender from "@entities/Map/model/MapRender.jsx";
 
 const Game = () => {
   const { gameId } = useParams();

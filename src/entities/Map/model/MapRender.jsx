@@ -6,7 +6,8 @@ import {
   firstPlayerPlacementTilesData,
   secondPlayerPlacementTilesData,
 } from "@shared/data/map/placementTilesData.jsx";
-import { GeneratePlacementTiles } from "./GeneratePlacementTiles";
+import { GeneratePlacementTiles } from "../utils/GeneratePlacementTiles";
+import { AddWizard } from "../utils/AddWizard";
 const MapRender = () => {
   const canvasRef = useRef(null);
 
@@ -16,6 +17,8 @@ const MapRender = () => {
   const secondPlayerTiles = GeneratePlacementTiles(
     secondPlayerPlacementTilesData
   );
+
+  let activeTile = undefined;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -31,6 +34,8 @@ const MapRender = () => {
     let lastTime = 0;
     const interval = 500;
     let enemyIndex = 0;
+
+    const wizards = [];
 
     function animate(time) {
       requestAnimationFrame(animate);
@@ -62,7 +67,19 @@ const MapRender = () => {
       secondPlayerTiles.forEach((tile) => {
         tile.update(ctx, mouse);
       });
+
+      wizards.forEach((wizard) => {
+        wizard.draw(ctx);
+      });
     }
+
+    canvas.addEventListener("click", (event) => {
+      if (activeTile && !activeTile.isOccupied) {
+        wizards.push(AddWizard(activeTile.x, activeTile.y));
+        activeTile.isOccupied = true;
+      }
+      console.log(wizards);
+    });
 
     requestAnimationFrame(animate);
   }, []);
@@ -75,6 +92,21 @@ const MapRender = () => {
   window.addEventListener("mousemove", (event) => {
     mouse.x = event.clientX;
     mouse.y = event.clientY;
+
+    activeTile = null;
+    for (let i = 0; i < firstPlayerTiles.length; i++) {
+      const tile = firstPlayerTiles[i];
+
+      if (
+        mouse.x > tile.x &&
+        mouse.x < tile.x + tile.size &&
+        mouse.y > tile.y &&
+        mouse.y < tile.y + tile.size
+      ) {
+        activeTile = tile;
+        break;
+      }
+    }
   });
 
   return <canvas ref={canvasRef} width={1280} height={772} />;
