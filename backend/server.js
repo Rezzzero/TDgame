@@ -4,6 +4,8 @@ import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
+import { CreateEnemy } from "./gameLogic/CreateEnemy.js";
+import { waypoints1, waypoints2 } from "../src/shared/data/map/paths.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +32,21 @@ app.get("/rooms", (req, res) => {
   res.json(Object.keys(rooms));
 });
 
+const createGameState = () => ({
+  firstEnemies: [CreateEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1, 1)],
+  secondEnemies: [CreateEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2, 1)],
+});
+
+const updateGameState = (gameId) => {
+  rooms[gameId].firstEnemies.forEach((enemy) => enemy.update());
+  rooms[gameId].secondEnemies.forEach((enemy) => enemy.update());
+
+  io.to(gameId).emit("gameState", {
+    firstEnemies: rooms[gameId].firstEnemies.map((enemy) => enemy.getState()),
+    secondEnemies: rooms[gameId].secondEnemies.map((enemy) => enemy.getState()),
+  });
+};
+
 io.on("connection", (socket) => {
   console.log("A user connected");
 
@@ -37,10 +54,11 @@ io.on("connection", (socket) => {
     socket.join(gameId);
 
     if (!rooms[gameId]) {
-      rooms[gameId] = [];
+      rooms[gameId] = createGameState();
+      rooms[gameId].users = [];
     }
 
-    const user = { id: socket.id, username, houseColor: "red" };
+    const user = { id: socket.id, username };
 
     if (rooms[gameId].length === 0) {
       user.houseColor = "blue";
@@ -48,25 +66,38 @@ io.on("connection", (socket) => {
       user.houseColor = "red";
     }
 
-    rooms[gameId].push(user);
+    rooms[gameId].users.push(user);
 
-    io.to(gameId).emit("updateUserList", rooms[gameId]);
+    io.to(gameId).emit("updateUserList", rooms[gameId].users);
 
-    socket.emit("houseColor", user.houseColor);
+    socket.emit("gameState", {
+      firstEnemies: rooms[gameId].firstEnemies.map((enemy) => enemy.getState()),
+      secondEnemies: rooms[gameId].secondEnemies.map((enemy) =>
+        enemy.getState()
+      ),
+    });
 
     socket.on("disconnect", () => {
       console.log("User disconnected");
 
-      rooms[gameId] = rooms[gameId].filter((user) => user.id !== socket.id);
+      rooms[gameId].users = rooms[gameId].users.filter(
+        (user) => user.id !== socket.id
+      );
 
-      if (rooms[gameId].length === 0) {
+      if (rooms[gameId].users.length === 0) {
         delete rooms[gameId];
       } else {
-        io.to(gameId).emit("updateUserList", rooms[gameId]);
+        io.to(gameId).emit("updateUserList", rooms[gameId].users);
       }
     });
   });
 });
+
+setInterval(() => {
+  Object.keys(rooms).forEach((gameId) => {
+    updateGameState(gameId);
+  });
+}, 100);
 
 httpServer.listen(8080, () => {
   console.log("Listening on port 8080");

@@ -16,7 +16,6 @@ export const PlacementTile = (x, y) => {
       mouse.y > y &&
       mouse.y < y + size
     ) {
-      console.log("colliding");
       color = "white";
     } else {
       color = "rgba(255, 255, 255, 0.3)";
