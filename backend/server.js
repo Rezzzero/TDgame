@@ -35,6 +35,7 @@ app.get("/rooms", (req, res) => {
 const createGameState = () => ({
   firstEnemies: [CreateEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1, 1)],
   secondEnemies: [CreateEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2, 1)],
+  wizards: [],
 });
 
 const updateGameState = (gameId) => {
@@ -44,6 +45,7 @@ const updateGameState = (gameId) => {
   io.to(gameId).emit("gameState", {
     firstEnemies: rooms[gameId].firstEnemies.map((enemy) => enemy.getState()),
     secondEnemies: rooms[gameId].secondEnemies.map((enemy) => enemy.getState()),
+    wizards: rooms[gameId].wizards,
   });
 };
 
@@ -60,12 +62,6 @@ io.on("connection", (socket) => {
 
     const user = { id: socket.id, username };
 
-    if (rooms[gameId].length === 0) {
-      user.houseColor = "blue";
-    } else if (rooms[gameId].length === 1) {
-      user.houseColor = "red";
-    }
-
     rooms[gameId].users.push(user);
 
     io.to(gameId).emit("updateUserList", rooms[gameId].users);
@@ -75,6 +71,20 @@ io.on("connection", (socket) => {
       secondEnemies: rooms[gameId].secondEnemies.map((enemy) =>
         enemy.getState()
       ),
+      wizards: rooms[gameId].wizards,
+    });
+
+    socket.on("placeWizard", (wizard) => {
+      rooms[gameId].wizards.push(wizard);
+      io.to(gameId).emit("gameState", {
+        firstEnemies: rooms[gameId].firstEnemies.map((enemy) =>
+          enemy.getState()
+        ),
+        secondEnemies: rooms[gameId].secondEnemies.map((enemy) =>
+          enemy.getState()
+        ),
+        wizards: rooms[gameId].wizards,
+      });
     });
 
     socket.on("disconnect", () => {
@@ -97,7 +107,7 @@ setInterval(() => {
   Object.keys(rooms).forEach((gameId) => {
     updateGameState(gameId);
   });
-}, 100);
+}, 1000);
 
 httpServer.listen(8080, () => {
   console.log("Listening on port 8080");

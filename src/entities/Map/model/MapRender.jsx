@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import gameMap from "@shared/assets/map/gameMap.png";
-// import createEnemy from "@shared/lib/enemy.jsx";
-// import { waypoints1, waypoints2 } from "@shared/data/map/paths.js";
 import {
   firstPlayerPlacementTilesData,
   secondPlayerPlacementTilesData,
@@ -10,18 +8,23 @@ import {
 import { GeneratePlacementTiles } from "../utils/GeneratePlacementTiles";
 import { AddWizard } from "../utils/AddWizard";
 import connectSocket from "../../../socket.io.js";
+import { Route } from "../../../shared/constants/constants.js";
+
 const MapRender = () => {
   const canvasRef = useRef(null);
+  const socketRef = useRef(null);
   const [users, setUsers] = useState([]);
   const { gameId } = useParams();
 
   const [gameState, setGameState] = useState({
     firstEnemies: [],
     secondEnemies: [],
+    wizards: [],
   });
 
   useEffect(() => {
     const socket = connectSocket();
+    socketRef.current = socket;
     const username = localStorage.getItem("username");
     if (username) {
       socket.emit("joinRoom", { gameId, username });
@@ -37,7 +40,6 @@ const MapRender = () => {
 
     return () => {
       socket.off("updateUserList");
-      socket.off("houseColor");
       socket.off("gameState");
     };
   }, [gameId]);
@@ -61,23 +63,8 @@ const MapRender = () => {
       animate();
     };
 
-    const wizards = [];
-
-    function animate(time) {
+    function animate() {
       requestAnimationFrame(animate);
-
-      // const deltaTime = time - lastTime;
-
-      // if (deltaTime > interval && enemyIndex < 9) {
-      //   enemies.push(
-      //     createEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1, 0.5)
-      //   );
-      //   enemies.push(
-      //     createEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2, 0.5)
-      //   );
-      //   enemyIndex++;
-      //   lastTime = time;
-      // }
 
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
@@ -99,20 +86,24 @@ const MapRender = () => {
         tile.update(ctx, mouse);
       });
 
-      wizards.forEach((wizard) => {
-        wizard.draw(ctx);
+      gameState.wizards.forEach((wizard) => {
+        AddWizard(wizard.x, wizard.y).draw(ctx);
       });
     }
 
-    canvas.addEventListener("click", (event) => {
+    canvas.addEventListener("click", handleCanvasClick);
+
+    function handleCanvasClick(event) {
       if (activeTile && !activeTile.isOccupied) {
-        wizards.push(AddWizard(activeTile.x, activeTile.y));
+        const wizard = { x: activeTile.x, y: activeTile.y };
+        socketRef.current.emit("placeWizard", wizard);
         activeTile.isOccupied = true;
       }
-      console.log(wizards);
-    });
+    }
 
-    requestAnimationFrame(animate);
+    return () => {
+      canvas.removeEventListener("click", handleCanvasClick);
+    };
   }, [gameState]);
 
   const mouse = {
@@ -145,6 +136,7 @@ const MapRender = () => {
       <canvas ref={canvasRef} width={1280} height={772} />
       <div className="text-white absolute top-0 left-0">
         <p>Набросок карты</p>
+        <Link to={Route.HOME}>Покинуть игру</Link>
         <h2>Подключенные пользователи:</h2>
         <ul>
           {users.map((user) => (
