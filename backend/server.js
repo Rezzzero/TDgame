@@ -35,7 +35,8 @@ app.get("/rooms", (req, res) => {
 const createGameState = () => ({
   firstEnemies: [CreateEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1, 1)],
   secondEnemies: [CreateEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2, 1)],
-  wizards: [],
+  firstWizards: [],
+  secondWizards: [],
 });
 
 const updateGameState = (gameId) => {
@@ -45,14 +46,29 @@ const updateGameState = (gameId) => {
   io.to(gameId).emit("gameState", {
     firstEnemies: rooms[gameId].firstEnemies.map((enemy) => enemy.getState()),
     secondEnemies: rooms[gameId].secondEnemies.map((enemy) => enemy.getState()),
-    wizards: rooms[gameId].wizards,
+    firstWizards: rooms[gameId].firstWizards,
+    secondWizards: rooms[gameId].secondWizards,
   });
 };
 
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("joinRoom", ({ gameId, username }) => {
+  socket.on("getPlayerType", (gameId, callback) => {
+    if (!rooms[gameId]) {
+      rooms[gameId] = createGameState();
+      rooms[gameId].users = [];
+    }
+    let playerType = "firstPlayer";
+    if (rooms[gameId].users.length === 1) {
+      playerType = "secondPlayer";
+    } else {
+      playerType = "viewer";
+    }
+    callback(playerType);
+  });
+
+  socket.on("joinRoom", ({ gameId, username, playerType }) => {
     socket.join(gameId);
 
     if (!rooms[gameId]) {
@@ -60,7 +76,7 @@ io.on("connection", (socket) => {
       rooms[gameId].users = [];
     }
 
-    const user = { id: socket.id, username };
+    const user = { id: socket.id, username, playerType };
 
     rooms[gameId].users.push(user);
 
@@ -71,11 +87,17 @@ io.on("connection", (socket) => {
       secondEnemies: rooms[gameId].secondEnemies.map((enemy) =>
         enemy.getState()
       ),
-      wizards: rooms[gameId].wizards,
+      firstWizards: rooms[gameId].firstWizards,
+      secondWizards: rooms[gameId].secondWizards,
     });
 
-    socket.on("placeWizard", (wizard) => {
-      rooms[gameId].wizards.push(wizard);
+    socket.on("placeWizard", ({ wizard, playerType }) => {
+      if (playerType === "firstPlayer") {
+        rooms[gameId].firstWizards.push(wizard);
+      } else if (playerType === "secondPlayer") {
+        rooms[gameId].secondWizards.push(wizard);
+      }
+
       io.to(gameId).emit("gameState", {
         firstEnemies: rooms[gameId].firstEnemies.map((enemy) =>
           enemy.getState()
@@ -83,7 +105,8 @@ io.on("connection", (socket) => {
         secondEnemies: rooms[gameId].secondEnemies.map((enemy) =>
           enemy.getState()
         ),
-        wizards: rooms[gameId].wizards,
+        firstWizards: rooms[gameId].firstWizards,
+        secondWizards: rooms[gameId].secondWizards,
       });
     });
 

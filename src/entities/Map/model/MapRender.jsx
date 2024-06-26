@@ -19,16 +19,22 @@ const MapRender = () => {
   const [gameState, setGameState] = useState({
     firstEnemies: [],
     secondEnemies: [],
-    wizards: [],
+    firstWizards: [],
+    secondWizards: [],
   });
 
   useEffect(() => {
     const socket = connectSocket();
     socketRef.current = socket;
     const username = localStorage.getItem("username");
-    if (username) {
-      socket.emit("joinRoom", { gameId, username });
-    }
+
+    socket.emit("getPlayerType", gameId, (playerType) => {
+      localStorage.setItem("playerType", playerType);
+
+      if (username) {
+        socket.emit("joinRoom", { gameId, username, playerType });
+      }
+    });
 
     socket.on("updateUserList", (userList) => {
       setUsers(userList);
@@ -41,6 +47,7 @@ const MapRender = () => {
     return () => {
       socket.off("updateUserList");
       socket.off("gameState");
+      socket.disconnect();
     };
   }, [gameId]);
 
@@ -86,7 +93,11 @@ const MapRender = () => {
         tile.update(ctx, mouse);
       });
 
-      gameState.wizards.forEach((wizard) => {
+      gameState.firstWizards.forEach((wizard) => {
+        AddWizard(wizard.x, wizard.y).draw(ctx);
+      });
+
+      gameState.secondWizards.forEach((wizard) => {
         AddWizard(wizard.x, wizard.y).draw(ctx);
       });
     }
@@ -95,9 +106,20 @@ const MapRender = () => {
 
     function handleCanvasClick(event) {
       if (activeTile && !activeTile.isOccupied) {
-        const wizard = { x: activeTile.x, y: activeTile.y };
-        socketRef.current.emit("placeWizard", wizard);
-        activeTile.isOccupied = true;
+        const playerType = localStorage.getItem("playerType");
+
+        const isFirstPlayerTile = firstPlayerTiles.includes(activeTile);
+        const isSecondPlayerTile = secondPlayerTiles.includes(activeTile);
+
+        if (
+          (playerType === "firstPlayer" && isFirstPlayerTile) ||
+          (playerType === "secondPlayer" && isSecondPlayerTile)
+        ) {
+          const wizard = { x: activeTile.x, y: activeTile.y };
+          console.log("playerType", playerType);
+          socketRef.current.emit("placeWizard", { wizard, playerType });
+          activeTile.isOccupied = true;
+        }
       }
     }
 
@@ -119,6 +141,19 @@ const MapRender = () => {
     for (let i = 0; i < firstPlayerTiles.length; i++) {
       const tile = firstPlayerTiles[i];
 
+      if (
+        mouse.x > tile.x &&
+        mouse.x < tile.x + tile.size &&
+        mouse.y > tile.y &&
+        mouse.y < tile.y + tile.size
+      ) {
+        activeTile = tile;
+        break;
+      }
+    }
+
+    for (let i = 0; i < secondPlayerTiles.length; i++) {
+      const tile = secondPlayerTiles[i];
       if (
         mouse.x > tile.x &&
         mouse.x < tile.x + tile.size &&
