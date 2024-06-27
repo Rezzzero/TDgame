@@ -62,8 +62,6 @@ io.on("connection", (socket) => {
     let playerType = "firstPlayer";
     if (rooms[gameId].users.length === 1) {
       playerType = "secondPlayer";
-    } else {
-      playerType = "viewer";
     }
     callback(playerType);
   });

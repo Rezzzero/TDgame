@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import gameMap from "@shared/assets/map/gameMap.png";
 import {
@@ -6,50 +6,18 @@ import {
   secondPlayerPlacementTilesData,
 } from "@shared/data/map/placementTilesData.jsx";
 import { GeneratePlacementTiles } from "../utils/GeneratePlacementTiles";
-import { AddWizard } from "../utils/AddWizard";
-import connectSocket from "../../../socket.io.js";
 import { Route } from "../../../shared/constants/constants.js";
+import {
+  AddWizard,
+  handleCanvasClick,
+  activeTileFunction,
+} from "../utils/AddWizardUtils.jsx";
+import { useSocket } from "../hooks/useSocket.jsx";
 
 const MapRender = () => {
   const canvasRef = useRef(null);
-  const socketRef = useRef(null);
-  const [users, setUsers] = useState([]);
   const { gameId } = useParams();
-
-  const [gameState, setGameState] = useState({
-    firstEnemies: [],
-    secondEnemies: [],
-    firstWizards: [],
-    secondWizards: [],
-  });
-
-  useEffect(() => {
-    const socket = connectSocket();
-    socketRef.current = socket;
-    const username = localStorage.getItem("username");
-
-    socket.emit("getPlayerType", gameId, (playerType) => {
-      localStorage.setItem("playerType", playerType);
-
-      if (username) {
-        socket.emit("joinRoom", { gameId, username, playerType });
-      }
-    });
-
-    socket.on("updateUserList", (userList) => {
-      setUsers(userList);
-    });
-
-    socket.on("gameState", (state) => {
-      setGameState(state);
-    });
-
-    return () => {
-      socket.off("updateUserList");
-      socket.off("gameState");
-      socket.disconnect();
-    };
-  }, [gameId]);
+  const { socketRef, users, gameState } = useSocket(gameId);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -102,29 +70,26 @@ const MapRender = () => {
       });
     }
 
-    canvas.addEventListener("click", handleCanvasClick);
-
-    function handleCanvasClick(event) {
-      if (activeTile && !activeTile.isOccupied) {
-        const playerType = localStorage.getItem("playerType");
-
-        const isFirstPlayerTile = firstPlayerTiles.includes(activeTile);
-        const isSecondPlayerTile = secondPlayerTiles.includes(activeTile);
-
-        if (
-          (playerType === "firstPlayer" && isFirstPlayerTile) ||
-          (playerType === "secondPlayer" && isSecondPlayerTile)
-        ) {
-          const wizard = { x: activeTile.x, y: activeTile.y };
-          console.log("playerType", playerType);
-          socketRef.current.emit("placeWizard", { wizard, playerType });
-          activeTile.isOccupied = true;
-        }
-      }
-    }
+    canvas.addEventListener("click", (event) =>
+      handleCanvasClick(
+        event,
+        activeTile,
+        firstPlayerTiles,
+        secondPlayerTiles,
+        socketRef
+      )
+    );
 
     return () => {
-      canvas.removeEventListener("click", handleCanvasClick);
+      canvas.removeEventListener("click", (event) =>
+        handleCanvasClick(
+          event,
+          activeTile,
+          firstPlayerTiles,
+          secondPlayerTiles,
+          socketRef
+        )
+      );
     };
   }, [gameState]);
 
@@ -137,33 +102,9 @@ const MapRender = () => {
     mouse.x = event.clientX;
     mouse.y = event.clientY;
 
-    activeTile = null;
-    for (let i = 0; i < firstPlayerTiles.length; i++) {
-      const tile = firstPlayerTiles[i];
-
-      if (
-        mouse.x > tile.x &&
-        mouse.x < tile.x + tile.size &&
-        mouse.y > tile.y &&
-        mouse.y < tile.y + tile.size
-      ) {
-        activeTile = tile;
-        break;
-      }
-    }
-
-    for (let i = 0; i < secondPlayerTiles.length; i++) {
-      const tile = secondPlayerTiles[i];
-      if (
-        mouse.x > tile.x &&
-        mouse.x < tile.x + tile.size &&
-        mouse.y > tile.y &&
-        mouse.y < tile.y + tile.size
-      ) {
-        activeTile = tile;
-        break;
-      }
-    }
+    activeTile =
+      activeTileFunction(firstPlayerTiles, mouse) ||
+      activeTileFunction(secondPlayerTiles, mouse);
   });
 
   return (
