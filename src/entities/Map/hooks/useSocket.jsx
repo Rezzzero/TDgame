@@ -10,13 +10,18 @@ export const useSocket = (gameId) => {
     firstWizards: [],
     secondWizards: [],
   });
+  const [user, setUser] = useState(null);
   useEffect(() => {
     const socket = connectSocket();
     socketRef.current = socket;
     const username = localStorage.getItem("username");
 
     socket.emit("getPlayerType", gameId, (playerType) => {
-      localStorage.setItem("playerType", playerType);
+      const user = {
+        username,
+        playerType,
+      };
+      setUser(user);
       if (username) {
         socket.emit("joinRoom", { gameId, username, playerType });
       }
@@ -37,5 +42,5 @@ export const useSocket = (gameId) => {
     };
   }, [gameId]);
 
-  return { socketRef, users, gameState };
+  return { socketRef, users, gameState, user };
 };

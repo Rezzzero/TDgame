@@ -5,19 +5,19 @@ import {
   firstPlayerPlacementTilesData,
   secondPlayerPlacementTilesData,
 } from "@shared/data/map/placementTilesData.jsx";
-import { GeneratePlacementTiles } from "../utils/GeneratePlacementTiles";
 import { Route } from "../../../shared/constants/constants.js";
 import {
   AddWizard,
   handleCanvasClick,
   activeTileFunction,
+  GeneratePlacementTiles,
 } from "../utils/AddWizardUtils.jsx";
 import { useSocket } from "../hooks/useSocket.jsx";
 
 const MapRender = () => {
   const canvasRef = useRef(null);
   const { gameId } = useParams();
-  const { socketRef, users, gameState } = useSocket(gameId);
+  const { socketRef, users, gameState, user } = useSocket(gameId);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -61,37 +61,46 @@ const MapRender = () => {
         tile.update(ctx, mouse);
       });
 
-      gameState.firstWizards.forEach((wizard) => {
-        AddWizard(wizard.x, wizard.y).draw(ctx);
-      });
+      const firstWizards = gameState.firstWizards.map((wizard) =>
+        AddWizard(wizard.x, wizard.y)
+      );
+      const secondWizards = gameState.secondWizards.map((wizard) =>
+        AddWizard(wizard.x, wizard.y)
+      );
 
-      gameState.secondWizards.forEach((wizard) => {
-        AddWizard(wizard.x, wizard.y).draw(ctx);
-      });
+      const drawWizards = (wizards, ctx) => {
+        wizards.forEach((wizard) => {
+          wizard.draw(ctx);
+          wizard.projectiles.forEach((projectile) => {
+            projectile.draw(ctx);
+          });
+        });
+      };
+
+      drawWizards(firstWizards, ctx);
+      drawWizards(secondWizards, ctx);
     }
+  }, [gameState]);
 
-    canvas.addEventListener("click", (event) =>
+  useEffect(() => {
+    const handleCanvasClickWrapper = (event) => {
       handleCanvasClick(
         event,
         activeTile,
         firstPlayerTiles,
         secondPlayerTiles,
+        user,
         socketRef
-      )
-    );
-
-    return () => {
-      canvas.removeEventListener("click", (event) =>
-        handleCanvasClick(
-          event,
-          activeTile,
-          firstPlayerTiles,
-          secondPlayerTiles,
-          socketRef
-        )
       );
     };
-  }, [gameState]);
+
+    const canvas = canvasRef.current;
+    canvas.addEventListener("click", handleCanvasClickWrapper);
+
+    return () => {
+      canvas.removeEventListener("click", handleCanvasClickWrapper);
+    };
+  }, [activeTile, firstPlayerTiles, secondPlayerTiles, user, socketRef]);
 
   const mouse = {
     x: undefined,
