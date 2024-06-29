@@ -37,12 +37,10 @@ const createGameState = () => ({
   secondEnemies: [CreateEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2, 1)],
   firstWizards: [],
   secondWizards: [],
+  gameStarted: false,
 });
 
 const updateGameState = (gameId) => {
-  rooms[gameId].firstEnemies.forEach((enemy) => enemy.update());
-  rooms[gameId].secondEnemies.forEach((enemy) => enemy.update());
-
   io.to(gameId).emit("gameState", {
     firstEnemies: rooms[gameId].firstEnemies.map((enemy) => enemy.getState()),
     secondEnemies: rooms[gameId].secondEnemies.map((enemy) => enemy.getState()),
@@ -50,6 +48,14 @@ const updateGameState = (gameId) => {
     secondWizards: rooms[gameId].secondWizards,
   });
 };
+
+const gameLoop = () => {
+  Object.keys(rooms).forEach((gameId) => {
+    updateGameState(gameId);
+  });
+};
+
+setInterval(gameLoop, 10);
 
 io.on("connection", (socket) => {
   console.log("A user connected");
@@ -89,6 +95,10 @@ io.on("connection", (socket) => {
       secondWizards: rooms[gameId].secondWizards,
     });
 
+    if (rooms[gameId].users.length === 2 && !rooms[gameId].gameStarted) {
+      rooms[gameId].gameStarted = true;
+    }
+
     socket.on("placeWizard", ({ wizard, playerType }) => {
       if (playerType === "firstPlayer") {
         rooms[gameId].firstWizards.push(wizard);
@@ -96,16 +106,7 @@ io.on("connection", (socket) => {
         rooms[gameId].secondWizards.push(wizard);
       }
 
-      io.to(gameId).emit("gameState", {
-        firstEnemies: rooms[gameId].firstEnemies.map((enemy) =>
-          enemy.getState()
-        ),
-        secondEnemies: rooms[gameId].secondEnemies.map((enemy) =>
-          enemy.getState()
-        ),
-        firstWizards: rooms[gameId].firstWizards,
-        secondWizards: rooms[gameId].secondWizards,
-      });
+      updateGameState(gameId);
     });
 
     socket.on("disconnect", () => {
@@ -123,12 +124,6 @@ io.on("connection", (socket) => {
     });
   });
 });
-
-setInterval(() => {
-  Object.keys(rooms).forEach((gameId) => {
-    updateGameState(gameId);
-  });
-}, 1000);
 
 httpServer.listen(8080, () => {
   console.log("Listening on port 8080");

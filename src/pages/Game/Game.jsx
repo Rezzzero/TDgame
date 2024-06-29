@@ -1,6 +1,6 @@
-import Map from "@entities/Map/Map.jsx";
+// import Map from "@entities/Game/Map.jsx";
 import React from "react";
-import MapRender from "@entities/Map/model/MapRender.jsx";
+import MapRender from "@entities/game/ui/MapRender.jsx";
 
 const Game = () => {
   return (

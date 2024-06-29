@@ -5,7 +5,7 @@ import {
   firstPlayerPlacementTilesData,
   secondPlayerPlacementTilesData,
 } from "@shared/data/map/placementTilesData.jsx";
-import { Route } from "../../../shared/constants/constants.js";
+import { Route } from "@shared/constants/constants.js";
 import {
   AddWizard,
   handleCanvasClick,
@@ -13,11 +13,15 @@ import {
   GeneratePlacementTiles,
 } from "../utils/AddWizardUtils.jsx";
 import { useSocket } from "../hooks/useSocket.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { setGameState } from "@entities/game/model/gameSlice.jsx";
 
 const MapRender = () => {
   const canvasRef = useRef(null);
   const { gameId } = useParams();
-  const { socketRef, users, gameState, user } = useSocket(gameId);
+  const { socketRef, users, user } = useSocket(gameId);
+  const dispatch = useDispatch();
+  const gameState = useSelector((state) => state.game);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -81,6 +85,19 @@ const MapRender = () => {
       drawWizards(secondWizards, ctx);
     }
   }, [gameState]);
+
+  useEffect(() => {
+    const handleGameStateUpdate = (gameState) => {
+      dispatch(setGameState(gameState));
+    };
+
+    const socket = socketRef.current;
+    socket.on("gameState", handleGameStateUpdate);
+
+    return () => {
+      socket.off("gameState", handleGameStateUpdate);
+    };
+  }, [dispatch, socketRef]);
 
   useEffect(() => {
     const handleCanvasClickWrapper = (event) => {

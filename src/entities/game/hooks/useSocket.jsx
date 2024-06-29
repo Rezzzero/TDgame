@@ -4,12 +4,6 @@ import connectSocket from "../../../socket.io.js";
 export const useSocket = (gameId) => {
   const socketRef = useRef(null);
   const [users, setUsers] = useState([]);
-  const [gameState, setGameState] = useState({
-    firstEnemies: [],
-    secondEnemies: [],
-    firstWizards: [],
-    secondWizards: [],
-  });
   const [user, setUser] = useState(null);
   useEffect(() => {
     const socket = connectSocket();
@@ -31,16 +25,11 @@ export const useSocket = (gameId) => {
       setUsers(userList);
     });
 
-    socket.on("gameState", (gameState) => {
-      setGameState(gameState);
-    });
-
     return () => {
       socket.off("updateUserList");
-      socket.off("gameState");
       socket.disconnect();
     };
   }, [gameId]);
 
-  return { socketRef, users, gameState, user };
+  return { socketRef, users, user };
 };
