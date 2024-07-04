@@ -4,8 +4,6 @@ import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
-import { CreateEnemy } from "./gameLogic/CreateEnemy.js";
-import { waypoints1, waypoints2 } from "../src/shared/data/map/paths.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,8 +31,8 @@ app.get("/rooms", (req, res) => {
 });
 
 const createGameState = () => ({
-  firstEnemies: [CreateEnemy(waypoints1[0].x, waypoints1[0].y, waypoints1, 1)],
-  secondEnemies: [CreateEnemy(waypoints2[0].x, waypoints2[0].y, waypoints2, 1)],
+  firstEnemies: [],
+  secondEnemies: [],
   firstWizards: [],
   secondWizards: [],
   gameStarted: false,
@@ -42,8 +40,8 @@ const createGameState = () => ({
 
 const updateGameState = (gameId) => {
   io.to(gameId).emit("gameState", {
-    firstEnemies: rooms[gameId].firstEnemies.map((enemy) => enemy.getState()),
-    secondEnemies: rooms[gameId].secondEnemies.map((enemy) => enemy.getState()),
+    firstEnemies: rooms[gameId].firstEnemies,
+    secondEnemies: rooms[gameId].secondEnemies,
     firstWizards: rooms[gameId].firstWizards,
     secondWizards: rooms[gameId].secondWizards,
   });
@@ -55,7 +53,7 @@ const gameLoop = () => {
   });
 };
 
-setInterval(gameLoop, 10);
+setInterval(gameLoop, 500);
 
 io.on("connection", (socket) => {
   console.log("A user connected");
@@ -87,16 +85,15 @@ io.on("connection", (socket) => {
     io.to(gameId).emit("updateUserList", rooms[gameId].users);
 
     socket.emit("gameState", {
-      firstEnemies: rooms[gameId].firstEnemies.map((enemy) => enemy.getState()),
-      secondEnemies: rooms[gameId].secondEnemies.map((enemy) =>
-        enemy.getState()
-      ),
+      firstEnemies: rooms[gameId].firstEnemies,
+      secondEnemies: rooms[gameId].secondEnemies,
       firstWizards: rooms[gameId].firstWizards,
       secondWizards: rooms[gameId].secondWizards,
     });
 
     if (rooms[gameId].users.length === 2 && !rooms[gameId].gameStarted) {
       rooms[gameId].gameStarted = true;
+      io.to(gameId).emit("gameStarted");
     }
 
     socket.on("placeWizard", ({ wizard, playerType }) => {

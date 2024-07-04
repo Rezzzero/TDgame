@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import gameMap from "@shared/assets/map/gameMap.png";
 import {
@@ -12,9 +12,11 @@ import {
   activeTileFunction,
   GeneratePlacementTiles,
 } from "../utils/AddWizardUtils.jsx";
+import { createEnemy } from "../utils/enemyUtils.jsx";
 import { useSocket } from "../hooks/useSocket.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { setGameState } from "@entities/game/model/gameSlice.jsx";
+import { setGameState } from "@entities/Game/model/gameSlice.jsx";
+import { waypoints1, waypoints2 } from "../../../shared/data/map/paths.js";
 
 const MapRender = () => {
   const canvasRef = useRef(null);
@@ -22,6 +24,8 @@ const MapRender = () => {
   const { socketRef, users, user } = useSocket(gameId);
   const dispatch = useDispatch();
   const gameState = useSelector((state) => state.game);
+  const [firstEnemies, setFirstEnemies] = useState([]);
+  const [secondEnemies, setSecondEnemies] = useState([]);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -47,14 +51,14 @@ const MapRender = () => {
 
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-      gameState.firstEnemies.forEach((enemy) => {
-        ctx.fillStyle = "red";
-        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+      firstEnemies.forEach((enemy) => {
+        enemy.update();
+        enemy.draw(ctx);
       });
 
-      gameState.secondEnemies.forEach((enemy) => {
-        ctx.fillStyle = "blue";
-        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+      secondEnemies.forEach((enemy) => {
+        enemy.update();
+        enemy.draw(ctx);
       });
 
       firstPlayerTiles.forEach((tile) => {
@@ -91,11 +95,31 @@ const MapRender = () => {
       dispatch(setGameState(gameState));
     };
 
+    const handleGameStarted = () => {
+      const enemy1 = createEnemy(
+        waypoints1[0].x,
+        waypoints1[0].y,
+        waypoints1,
+        0.2
+      );
+      const enemy2 = createEnemy(
+        waypoints2[0].x,
+        waypoints2[0].y,
+        waypoints2,
+        0.2
+      );
+
+      setFirstEnemies([enemy1]);
+      setSecondEnemies([enemy2]);
+    };
+
     const socket = socketRef.current;
     socket.on("gameState", handleGameStateUpdate);
+    socket.on("gameStarted", handleGameStarted);
 
     return () => {
       socket.off("gameState", handleGameStateUpdate);
+      socket.on("gameStarted", handleGameStarted);
     };
   }, [dispatch, socketRef]);
 

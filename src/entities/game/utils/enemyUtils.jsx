@@ -1,4 +1,4 @@
-const createEnemy = (initialX, initialY, waypoints, speed) => {
+export const createEnemy = (initialX, initialY, waypoints, speed) => {
   let x = initialX;
   let y = initialY;
   let width = 10;
@@ -38,5 +38,3 @@ const createEnemy = (initialX, initialY, waypoints, speed) => {
 
   return { update, draw };
 };
-
-export default createEnemy;
