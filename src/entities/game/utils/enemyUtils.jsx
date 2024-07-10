@@ -36,5 +36,5 @@ export const createEnemy = (initialX, initialY, waypoints, speed) => {
     ctx.fillRect(x, y, width, height);
   };
 
-  return { update, draw };
+  return { x, y, update, draw };
 };

@@ -46,6 +46,13 @@ const MapRender = () => {
       animate();
     };
 
+    const firstWizards = gameState.firstWizards.map((wizard) =>
+      AddWizard(wizard.x, wizard.y, secondEnemies)
+    );
+    const secondWizards = gameState.secondWizards.map((wizard) =>
+      AddWizard(wizard.x, wizard.y, firstEnemies)
+    );
+
     function animate() {
       requestAnimationFrame(animate);
 
@@ -69,18 +76,12 @@ const MapRender = () => {
         tile.update(ctx, mouse);
       });
 
-      const firstWizards = gameState.firstWizards.map((wizard) =>
-        AddWizard(wizard.x, wizard.y)
-      );
-      const secondWizards = gameState.secondWizards.map((wizard) =>
-        AddWizard(wizard.x, wizard.y)
-      );
-
       const drawWizards = (wizards, ctx) => {
         wizards.forEach((wizard) => {
           wizard.draw(ctx);
+
           wizard.projectiles.forEach((projectile) => {
-            projectile.draw(ctx);
+            projectile.update(ctx);
           });
         });
       };
@@ -119,7 +120,7 @@ const MapRender = () => {
 
     return () => {
       socket.off("gameState", handleGameStateUpdate);
-      socket.on("gameStarted", handleGameStarted);
+      socket.off("gameStarted", handleGameStarted);
     };
   }, [dispatch, socketRef]);
 

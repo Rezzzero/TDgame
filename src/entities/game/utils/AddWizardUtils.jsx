@@ -45,27 +45,45 @@ export const GeneratePlacementTiles = (placementTilesData) => {
   return tiles;
 };
 
-export const Projectile = (position = { x: 0, y: 0 }) => {
-  let x = position.x;
-  let y = position.y;
+const Projectile = (initialX, initialY, enemies) => {
+  let x = initialX;
+  let y = initialY;
   let velocity = { x: 0, y: 0 };
+
+  const update = (ctx) => {
+    if (enemies.length > 0) {
+      const angle = Math.atan2(enemies[0].y - y, enemies[0].x - x);
+      velocity = { x: Math.cos(angle), y: Math.sin(angle) };
+      x += velocity.x;
+      y += velocity.y;
+    }
+    draw(ctx);
+  };
 
   const draw = (ctx) => {
     ctx.beginPath();
-    ctx.arc(x, y, 10, 0, 2 * Math.PI);
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
     ctx.fillStyle = "orange";
     ctx.fill();
   };
 
-  return { x, y, velocity, draw };
+  return { update, x, y, velocity };
 };
 
-export const AddWizard = (x, y) => {
+export const AddWizard = (x, y, enemies) => {
   const width = 32 * 2;
-  let projectiles = [Projectile({ x: x, y: y })];
+  const height = 32;
+  const center = { x: x + width / 2, y: y + height / 2 };
+
+  let projectiles = [Projectile(center.x, center.y, enemies)];
+
   const draw = (ctx) => {
     ctx.fillStyle = "blue";
     ctx.fillRect(x, y, width, 32);
+
+    projectiles.forEach((projectile) => {
+      projectile.update(ctx);
+    });
   };
 
   return { x, y, projectiles, draw };
