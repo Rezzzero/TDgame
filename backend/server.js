@@ -53,7 +53,7 @@ const gameLoop = () => {
   });
 };
 
-setInterval(gameLoop, 500);
+setInterval(gameLoop, 5000);
 
 io.on("connection", (socket) => {
   console.log("A user connected");
