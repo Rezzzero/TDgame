@@ -1,6 +1,6 @@
-import { useRooms } from "@entities/Room/model/useRooms";
-import RoomList from "@entities/Room/ui/RoomList";
-import CreateGameButton from "@features/CreateGame/ui/CreateGameButton";
+import { useRooms } from "../../entities/Room/model/useRooms";
+import RoomList from "../../entities/Room/ui/RoomList";
+import CreateGameButton from "../../features/CreateGame/ui/CreateGameButton";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchRooms } from "@shared/api/api";
+import { fetchRooms } from "../../../shared/api/api";
 
 export const useRooms = () => {
   const [rooms, setRooms] = useState([]);

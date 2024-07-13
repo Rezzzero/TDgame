@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import gameMap from "@shared/assets/map/gameMap.png";
+import gameMap from "../../../shared/assets/map/gameMap.png";
 import {
   firstPlayerPlacementTilesData,
   secondPlayerPlacementTilesData,
-} from "@shared/data/map/placementTilesData.jsx";
-import { Route } from "@shared/constants/constants.js";
+} from "../../../shared/data/map/placementTilesData.jsx";
+import { Route } from "../../../shared/constants/constants.js";
 import {
   AddWizard,
   handleCanvasClick,
@@ -15,7 +15,7 @@ import {
 import { createEnemy } from "../utils/enemyUtils.jsx";
 import { useSocket } from "../hooks/useSocket.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { setGameState } from "@entities/Game/model/gameSlice.jsx";
+import { setGameState } from "../model/gameSlice.jsx";
 import { waypoints1, waypoints2 } from "../../../shared/data/map/paths.js";
 
 const MapRender = () => {
