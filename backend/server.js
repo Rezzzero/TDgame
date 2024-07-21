@@ -52,7 +52,7 @@ const gameLoop = () => {
     updateGameState(gameId);
   });
 };
-
+//раз в пять секунд обновляет данные о игре
 setInterval(gameLoop, 5000);
 
 io.on("connection", (socket) => {
@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
       rooms[gameId].gameStarted = true;
       io.to(gameId).emit("gameStarted");
     }
-
+    //При установке защитника отправляется событие клиентам для обновления состояния игры
     socket.on("placeWizard", ({ wizard, playerType }) => {
       if (playerType === "firstPlayer") {
         rooms[gameId].firstWizards.push(wizard);

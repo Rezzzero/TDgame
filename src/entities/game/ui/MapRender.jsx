@@ -24,6 +24,7 @@ const MapRender = () => {
   const { socketRef, users, user } = useSocket(gameId);
   const dispatch = useDispatch();
   const gameState = useSelector((state) => state.game);
+  //Два состояния врагов
   const [firstEnemies, setFirstEnemies] = useState([]);
   const [secondEnemies, setSecondEnemies] = useState([]);
 
@@ -46,6 +47,10 @@ const MapRender = () => {
       animate();
     };
 
+    //Тут перебираются защитники и для каждого защитника которые был установлен мы используем функцию AddWizard и в качестве параметра даем массив с врагами
+    //И вот проблема в том что этот массив по факту является состоянием, и он статичен, я пробовал использовать useRef, store,store из redux
+    //но я не представляю как можно реализовать чтобы это состояние обновлялось в animate где оно перебирается под комментарием ниже
+    //Надеюсь чет сможешь найти и подсказать
     const firstWizards = gameState.firstWizards.map((wizard) =>
       AddWizard(wizard.x, wizard.y, secondEnemies)
     );
@@ -57,7 +62,7 @@ const MapRender = () => {
       requestAnimationFrame(animate);
 
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
+      //Перебор состояния врагов методом forEach для отрисовки в animate
       firstEnemies.forEach((enemy) => {
         enemy.update();
         enemy.draw(ctx);
@@ -95,7 +100,7 @@ const MapRender = () => {
     const handleGameStateUpdate = (gameState) => {
       dispatch(setGameState(gameState));
     };
-
+    //Задаем состояния врагов при старте игры
     const handleGameStarted = () => {
       const enemy1 = createEnemy(
         waypoints1[0].x,
