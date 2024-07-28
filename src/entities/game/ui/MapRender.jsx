@@ -27,7 +27,7 @@ const MapRender = () => {
   const gameState = useSelector((state) => state.game);
   const [firstEnemies, setFirstEnemies] = useState([]);
   const [secondEnemies, setSecondEnemies] = useState([]);
-  const [enemyPositions, setEnemyPositions] = useState([]);
+  const enemyPositionsRef = useRef([]);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -39,7 +39,7 @@ const MapRender = () => {
   let activeTile = undefined;
 
   const handleEnemies = (enemies) => {
-    setEnemyPositions(enemies);
+    enemyPositionsRef.current = enemies;
   };
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const MapRender = () => {
     };
 
     const firstWizards = gameState.firstWizards.map((wizard) =>
-      AddWizard(wizard.x, wizard.y, enemyPositions)
+      AddWizard(wizard.x, wizard.y, enemyPositionsRef.current)
     );
     const secondWizards = gameState.secondWizards.map((wizard) =>
       AddWizard(wizard.x, wizard.y, firstEnemies)
@@ -65,7 +65,7 @@ const MapRender = () => {
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
       // Отрисовка врагов из состояния
-      enemyPositions.forEach((pos) => {
+      enemyPositionsRef.current.forEach((pos) => {
         ctx.fillStyle = "red";
         ctx.fillRect(pos.x, pos.y, 10, 20); // Отрисовка врага с размерами 10x20
       });
@@ -91,7 +91,7 @@ const MapRender = () => {
       drawWizards(firstWizards, ctx);
       drawWizards(secondWizards, ctx);
     }
-  }, [gameState, enemyPositions]);
+  }, [gameState]);
 
   useEffect(() => {
     const handleGameStateUpdate = (gameState) => {
