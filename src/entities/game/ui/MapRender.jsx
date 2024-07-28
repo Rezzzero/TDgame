@@ -17,6 +17,7 @@ import { useSocket } from "../hooks/useSocket.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { setGameState } from "../model/gameSlice.jsx";
 import { waypoints1, waypoints2 } from "../../../shared/data/map/paths.js";
+import { EnemyComponent } from "../../Enemy/ui/EnemyComponent.jsx";
 
 const MapRender = () => {
   const canvasRef = useRef(null);
@@ -24,9 +25,9 @@ const MapRender = () => {
   const { socketRef, users, user } = useSocket(gameId);
   const dispatch = useDispatch();
   const gameState = useSelector((state) => state.game);
-  //Два состояния врагов
   const [firstEnemies, setFirstEnemies] = useState([]);
   const [secondEnemies, setSecondEnemies] = useState([]);
+  const [enemyPositions, setEnemyPositions] = useState([]);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -36,6 +37,10 @@ const MapRender = () => {
   );
 
   let activeTile = undefined;
+
+  const handleEnemies = (enemies) => {
+    setEnemyPositions(enemies);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -47,12 +52,8 @@ const MapRender = () => {
       animate();
     };
 
-    //Тут перебираются защитники и для каждого защитника которые был установлен мы используем функцию AddWizard и в качестве параметра даем массив с врагами
-    //И вот проблема в том что этот массив по факту является состоянием, и он статичен, я пробовал использовать useRef, store,store из redux
-    //но я не представляю как можно реализовать чтобы это состояние обновлялось в animate где оно перебирается под комментарием ниже
-    //Надеюсь чет сможешь найти и подсказать
     const firstWizards = gameState.firstWizards.map((wizard) =>
-      AddWizard(wizard.x, wizard.y, secondEnemies)
+      AddWizard(wizard.x, wizard.y, enemyPositions)
     );
     const secondWizards = gameState.secondWizards.map((wizard) =>
       AddWizard(wizard.x, wizard.y, firstEnemies)
@@ -62,15 +63,11 @@ const MapRender = () => {
       requestAnimationFrame(animate);
 
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-      //Перебор состояния врагов методом forEach для отрисовки в animate
-      firstEnemies.forEach((enemy) => {
-        enemy.update();
-        enemy.draw(ctx);
-      });
 
-      secondEnemies.forEach((enemy) => {
-        enemy.update();
-        enemy.draw(ctx);
+      // Отрисовка врагов из состояния
+      enemyPositions.forEach((pos) => {
+        ctx.fillStyle = "red";
+        ctx.fillRect(pos.x, pos.y, 10, 20); // Отрисовка врага с размерами 10x20
       });
 
       firstPlayerTiles.forEach((tile) => {
@@ -94,13 +91,13 @@ const MapRender = () => {
       drawWizards(firstWizards, ctx);
       drawWizards(secondWizards, ctx);
     }
-  }, [gameState]);
+  }, [gameState, enemyPositions]);
 
   useEffect(() => {
     const handleGameStateUpdate = (gameState) => {
       dispatch(setGameState(gameState));
     };
-    //Задаем состояния врагов при старте игры
+
     const handleGameStarted = () => {
       const enemy1 = createEnemy(
         waypoints1[0].x,
@@ -166,6 +163,11 @@ const MapRender = () => {
   return (
     <>
       <canvas ref={canvasRef} width={1280} height={772} />
+      <EnemyComponent
+        handleEnemies={handleEnemies}
+        waypoints={waypoints2}
+        speed={1}
+      />
       <div className="text-white absolute top-0 left-0">
         <p>Набросок карты</p>
         <Link to={Route.HOME}>Покинуть игру</Link>

@@ -44,7 +44,7 @@ export const GeneratePlacementTiles = (placementTilesData) => {
 
   return tiles;
 };
-//Функция Projeсtile нужна для того чтобы отрисовывать и обновлять снаряд,так-же принимает начальные координаты и массив врагов
+
 const Projectile = (initialX, initialY, enemies) => {
   let x = initialX;
   let y = initialY;
@@ -57,7 +57,7 @@ const Projectile = (initialX, initialY, enemies) => {
       x += velocity.x;
       y += velocity.y;
     }
-    //это так везде происходит то что draw вызывается внутри update метода чтобы отображать движение снаряда
+
     draw(ctx);
   };
 
@@ -71,7 +71,6 @@ const Projectile = (initialX, initialY, enemies) => {
   return { update, x, y, velocity };
 };
 
-//Функция ниже создает защитников и принимает в качестве параметров координаты и массив врагов,чтобы потом передавать его в Projectile
 export const AddWizard = (x, y, enemies) => {
   const width = 32 * 2;
   const height = 32;
