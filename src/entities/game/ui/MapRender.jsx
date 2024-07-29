@@ -64,10 +64,9 @@ const MapRender = () => {
 
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-      // Отрисовка врагов из состояния
       enemyPositionsRef.current.forEach((pos) => {
         ctx.fillStyle = "red";
-        ctx.fillRect(pos.x, pos.y, 10, 20); // Отрисовка врага с размерами 10x20
+        ctx.fillRect(pos.x, pos.y, 10, 20);
       });
 
       firstPlayerTiles.forEach((tile) => {
@@ -91,7 +90,7 @@ const MapRender = () => {
       drawWizards(firstWizards, ctx);
       drawWizards(secondWizards, ctx);
     }
-  }, [gameState]);
+  }, [gameState, enemyPositionsRef]);
 
   useEffect(() => {
     const handleGameStateUpdate = (gameState) => {

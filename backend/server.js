@@ -47,14 +47,6 @@ const updateGameState = (gameId) => {
   });
 };
 
-const gameLoop = () => {
-  Object.keys(rooms).forEach((gameId) => {
-    updateGameState(gameId);
-  });
-};
-//раз в пять секунд обновляет данные о игре
-setInterval(gameLoop, 5000);
-
 io.on("connection", (socket) => {
   console.log("A user connected");
 
