@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Oval } from "react-loader-spinner";
 import gameMap from "../../../shared/assets/map/gameMap.png";
 import {
   firstPlayerPlacementTilesData,
@@ -12,7 +13,6 @@ import {
   activeTileFunction,
   GeneratePlacementTiles,
 } from "../utils/AddWizardUtils.jsx";
-import { createEnemy } from "../utils/enemyUtils.jsx";
 import { useSocket } from "../hooks/useSocket.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { setGameState } from "../model/gameSlice.jsx";
@@ -25,9 +25,9 @@ const MapRender = () => {
   const { socketRef, users, user } = useSocket(gameId);
   const dispatch = useDispatch();
   const gameState = useSelector((state) => state.game);
-  const [firstEnemies, setFirstEnemies] = useState([]);
-  const [secondEnemies, setSecondEnemies] = useState([]);
-  const enemyPositionsRef = useRef([]);
+  const [gameStart, setGameStart] = useState(false);
+  const firstEnemyPositionsRef = useRef([]);
+  const secondEnemyPositionsRef = useRef([]);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -38,8 +38,12 @@ const MapRender = () => {
 
   let activeTile = undefined;
 
-  const handleEnemies = (enemies) => {
-    enemyPositionsRef.current = enemies;
+  const handleFirstEnemies = (enemies) => {
+    firstEnemyPositionsRef.current = enemies;
+  };
+
+  const handleSecondEnemies = (enemies) => {
+    secondEnemyPositionsRef.current = enemies;
   };
 
   useEffect(() => {
@@ -53,18 +57,25 @@ const MapRender = () => {
     };
 
     const firstWizards = gameState.firstWizards.map((wizard) =>
-      AddWizard(wizard.x, wizard.y, enemyPositionsRef.current)
+      AddWizard(wizard.x, wizard.y, firstEnemyPositionsRef.current)
     );
     const secondWizards = gameState.secondWizards.map((wizard) =>
-      AddWizard(wizard.x, wizard.y, firstEnemies)
+      AddWizard(wizard.x, wizard.y, secondEnemyPositionsRef.current)
     );
 
     function animate() {
+      if (!gameStart) return;
+
       requestAnimationFrame(animate);
 
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-      enemyPositionsRef.current.forEach((pos) => {
+      firstEnemyPositionsRef.current.forEach((pos) => {
+        ctx.fillStyle = "red";
+        ctx.fillRect(pos.x, pos.y, 10, 20);
+      });
+
+      secondEnemyPositionsRef.current.forEach((pos) => {
         ctx.fillStyle = "red";
         ctx.fillRect(pos.x, pos.y, 10, 20);
       });
@@ -90,7 +101,10 @@ const MapRender = () => {
       drawWizards(firstWizards, ctx);
       drawWizards(secondWizards, ctx);
     }
-  }, [gameState, enemyPositionsRef]);
+    image.onload = () => {
+      animate(); // Начать анимацию после загрузки карты
+    };
+  }, [gameState, firstEnemyPositionsRef, secondEnemyPositionsRef, gameStart]);
 
   useEffect(() => {
     const handleGameStateUpdate = (gameState) => {
@@ -98,21 +112,7 @@ const MapRender = () => {
     };
 
     const handleGameStarted = () => {
-      const enemy1 = createEnemy(
-        waypoints1[0].x,
-        waypoints1[0].y,
-        waypoints1,
-        0.2
-      );
-      const enemy2 = createEnemy(
-        waypoints2[0].x,
-        waypoints2[0].y,
-        waypoints2,
-        0.2
-      );
-
-      setFirstEnemies([enemy1]);
-      setSecondEnemies([enemy2]);
+      setGameStart(true);
     };
 
     const socket = socketRef.current;
@@ -161,12 +161,27 @@ const MapRender = () => {
 
   return (
     <>
+      {!gameStart && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-50">
+          <Oval color="#00BFFF" height={80} width={80} />
+          <p className="text-white mt-4 text-lg">Ожидание противника...</p>
+        </div>
+      )}
       <canvas ref={canvasRef} width={1280} height={772} />
-      <EnemyComponent
-        handleEnemies={handleEnemies}
-        waypoints={waypoints2}
-        speed={1}
-      />
+      {gameStart && (
+        <>
+          <EnemyComponent
+            handleEnemies={handleFirstEnemies}
+            waypoints={waypoints2}
+            speed={1}
+          />
+          <EnemyComponent
+            handleEnemies={handleSecondEnemies}
+            waypoints={waypoints1}
+            speed={1}
+          />
+        </>
+      )}
       <div className="text-white absolute top-0 left-0">
         <p>Набросок карты</p>
         <Link to={Route.HOME}>Покинуть игру</Link>
