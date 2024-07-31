@@ -67,5 +67,5 @@ export const EnemyComponent = ({ handleEnemies, waypoints, speed }) => {
     }
   }, [enemies, handleEnemies]);
 
-  return null; // Компонент не рендерит ничего
+  return null;
 };

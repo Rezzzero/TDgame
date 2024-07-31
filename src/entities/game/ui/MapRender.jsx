@@ -102,7 +102,7 @@ const MapRender = () => {
       drawWizards(secondWizards, ctx);
     }
     image.onload = () => {
-      animate(); // Начать анимацию после загрузки карты
+      animate();
     };
   }, [gameState, firstEnemyPositionsRef, secondEnemyPositionsRef, gameStart]);
 
