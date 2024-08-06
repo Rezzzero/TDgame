@@ -87,16 +87,21 @@ const Projectile = (initialX, initialY, enemies) => {
   return { update, hit };
 };
 
-export const AddWizard = (x, y, enemies) => {
+export const AddWizard = (x, y, enemies, shooted, setShootStatus) => {
   const width = 32 * 2;
   const height = 32;
   const center = { x: x + width / 2, y: y + height / 2 };
 
-  let projectiles = [Projectile(center.x, center.y, enemies)];
+  let projectiles = [];
+
+  if (!shooted) {
+    projectiles.push(Projectile(center.x, center.y, enemies));
+    setShootStatus(true);
+  }
 
   const draw = (ctx) => {
     ctx.fillStyle = "blue";
-    ctx.fillRect(x, y, width, 32);
+    ctx.fillRect(x, y, width, height);
 
     projectiles.forEach((projectile) => {
       projectile.update(ctx);

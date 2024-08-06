@@ -14,8 +14,6 @@ import {
   GeneratePlacementTiles,
 } from "../utils/AddWizardUtils.jsx";
 import { useSocket } from "../hooks/useSocket.jsx";
-import { useDispatch, useSelector } from "react-redux";
-import { setGameState } from "../model/gameSlice.jsx";
 import { waypoints1, waypoints2 } from "../../../shared/data/map/paths.js";
 import { EnemyComponent } from "../../Enemy/ui/EnemyComponent.jsx";
 
@@ -23,8 +21,14 @@ const MapRender = () => {
   const canvasRef = useRef(null);
   const { gameId } = useParams();
   const { socketRef, users, user } = useSocket(gameId);
-  const dispatch = useDispatch();
-  const gameState = useSelector((state) => state.game);
+  const [gameState, setGameState] = useState({
+    firstWizards: [],
+    secondWizards: [],
+  });
+  const [wizardShootStatus, setWizardShootStatus] = useState({
+    firstWizards: [],
+    secondWizards: [],
+  });
   const [gameStart, setGameStart] = useState(false);
   const firstEnemyPositionsRef = useRef([]);
   const secondEnemyPositionsRef = useRef([]);
@@ -56,11 +60,34 @@ const MapRender = () => {
       animate();
     };
 
-    const firstWizards = gameState.firstWizards.map((wizard) =>
-      AddWizard(wizard.x, wizard.y, firstEnemyPositionsRef.current)
+    const firstWizards = gameState.firstWizards.map((wizard, index) =>
+      AddWizard(
+        wizard.x,
+        wizard.y,
+        firstEnemyPositionsRef.current,
+        wizardShootStatus.firstWizards[index],
+        (shooted) =>
+          setWizardShootStatus((prev) => {
+            const newStatus = [...prev.firstWizards];
+            newStatus[index] = shooted;
+            return { ...prev, firstWizards: newStatus };
+          })
+      )
     );
-    const secondWizards = gameState.secondWizards.map((wizard) =>
-      AddWizard(wizard.x, wizard.y, secondEnemyPositionsRef.current)
+
+    const secondWizards = gameState.secondWizards.map((wizard, index) =>
+      AddWizard(
+        wizard.x,
+        wizard.y,
+        secondEnemyPositionsRef.current,
+        wizardShootStatus.secondWizards[index],
+        (shooted) =>
+          setWizardShootStatus((prev) => {
+            const newStatus = [...prev.secondWizards];
+            newStatus[index] = shooted;
+            return { ...prev, secondWizards: newStatus };
+          })
+      )
     );
 
     function animate() {
@@ -108,7 +135,7 @@ const MapRender = () => {
 
   useEffect(() => {
     const handleGameStateUpdate = (gameState) => {
-      dispatch(setGameState(gameState));
+      setGameState(gameState);
     };
 
     const handleGameStarted = () => {
@@ -123,7 +150,7 @@ const MapRender = () => {
       socket.off("gameState", handleGameStateUpdate);
       socket.off("gameStarted", handleGameStarted);
     };
-  }, [dispatch, socketRef]);
+  }, [socketRef]);
 
   useEffect(() => {
     const handleCanvasClickWrapper = (event) => {
@@ -161,14 +188,12 @@ const MapRender = () => {
 
   return (
     <>
-      {!gameStart && (
+      {!gameStart ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-50">
           <Oval color="#00BFFF" height={80} width={80} />
           <p className="text-white mt-4 text-lg">Ожидание противника...</p>
         </div>
-      )}
-      <canvas ref={canvasRef} width={1280} height={772} />
-      {gameStart && (
+      ) : (
         <>
           <EnemyComponent
             handleEnemies={handleFirstEnemies}
@@ -182,6 +207,7 @@ const MapRender = () => {
           />
         </>
       )}
+      <canvas ref={canvasRef} width={1280} height={772} />
       <div className="text-white absolute top-0 left-0">
         <p>Набросок карты</p>
         <Link to={Route.HOME}>Покинуть игру</Link>
