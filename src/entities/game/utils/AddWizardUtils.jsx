@@ -50,13 +50,14 @@ const Projectile = (initialX, initialY, enemies) => {
   let y = initialY;
   let velocity = { x: 0, y: 0 };
   let hit = false;
+  const range = 3;
 
   const update = (ctx) => {
     if (hit) return;
 
     if (enemies.length > 0) {
       const angle = Math.atan2(enemies[0].y - y, enemies[0].x - x);
-      velocity = { x: Math.cos(angle), y: Math.sin(angle) };
+      velocity = { x: Math.cos(angle) * 2, y: Math.sin(angle) * 2 };
       x += velocity.x;
       y += velocity.y;
     }
@@ -68,8 +69,8 @@ const Projectile = (initialX, initialY, enemies) => {
     const roundedEnemyY = Math.round(enemy.y);
 
     if (
-      roundedProjectileX === roundedEnemyX &&
-      roundedProjectileY === roundedEnemyY
+      Math.abs(roundedProjectileX - roundedEnemyX) < range &&
+      Math.abs(roundedProjectileY - roundedEnemyY) < range
     ) {
       hit = true;
     } else {

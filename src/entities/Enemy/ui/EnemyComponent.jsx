@@ -55,13 +55,13 @@ export const EnemyComponent = ({ handleEnemies, waypoints, speed }) => {
       const intervalId = setInterval(() => {
         const updatedEnemies = enemies.map((enemy) => {
           const updatedEnemy = enemy.update();
-          return { ...enemy, ...updatedEnemy }; // Обновляем объект врага с новыми значениями
+          return { ...enemy, ...updatedEnemy };
         });
         setEnemies(updatedEnemies);
         handleEnemies(
           updatedEnemies.map((enemy) => ({ x: enemy.x, y: enemy.y }))
         );
-      }, 100); // обновляем каждые 100 мс
+      }, 100);
 
       return () => clearInterval(intervalId);
     }

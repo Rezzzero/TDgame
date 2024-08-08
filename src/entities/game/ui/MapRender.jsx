@@ -99,12 +99,16 @@ const MapRender = () => {
 
       firstEnemyPositionsRef.current.forEach((pos) => {
         ctx.fillStyle = "red";
-        ctx.fillRect(pos.x, pos.y, 10, 20);
+        ctx.beginPath();
+        ctx.arc(pos.x + 5, pos.y + 5, 5, 0, 2 * Math.PI);
+        ctx.fill();
       });
 
       secondEnemyPositionsRef.current.forEach((pos) => {
         ctx.fillStyle = "red";
-        ctx.fillRect(pos.x, pos.y, 10, 20);
+        ctx.beginPath();
+        ctx.arc(pos.x + 5, pos.y + 5, 5, 0, 2 * Math.PI);
+        ctx.fill();
       });
 
       firstPlayerTiles.forEach((tile) => {
