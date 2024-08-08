@@ -152,3 +152,25 @@ export const activeTileFunction = (arr, mouse) => {
   }
   return null;
 };
+
+export const createWizards = (
+  wizards,
+  enemyPositions,
+  wizardShootStatus,
+  setWizardShootStatus
+) => {
+  return wizards.map((wizard, index) =>
+    AddWizard(
+      wizard.x,
+      wizard.y,
+      enemyPositions,
+      wizardShootStatus[index],
+      (shooted) =>
+        setWizardShootStatus((prev) => {
+          const newStatus = [...wizardShootStatus];
+          newStatus[index] = shooted;
+          return { ...prev, firstWizards: newStatus };
+        })
+    )
+  );
+};

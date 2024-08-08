@@ -8,14 +8,15 @@ import {
 } from "../../../shared/data/map/placementTilesData.jsx";
 import { Route } from "../../../shared/constants/constants.js";
 import {
-  AddWizard,
   handleCanvasClick,
   activeTileFunction,
   GeneratePlacementTiles,
+  createWizards,
 } from "../utils/AddWizardUtils.jsx";
 import { useSocket } from "../hooks/useSocket.jsx";
 import { waypoints1, waypoints2 } from "../../../shared/data/map/paths.js";
 import { EnemyComponent } from "../../Enemy/ui/EnemyComponent.jsx";
+import { useGameEvents } from "../hooks/useGameEvents.jsx";
 
 const MapRender = () => {
   const canvasRef = useRef(null);
@@ -32,6 +33,7 @@ const MapRender = () => {
   const [gameStart, setGameStart] = useState(false);
   const firstEnemyPositionsRef = useRef([]);
   const secondEnemyPositionsRef = useRef([]);
+  useGameEvents(socketRef, setGameState, setGameStart);
 
   const firstPlayerTiles = GeneratePlacementTiles(
     firstPlayerPlacementTilesData
@@ -60,34 +62,26 @@ const MapRender = () => {
       animate();
     };
 
-    const firstWizards = gameState.firstWizards.map((wizard, index) =>
-      AddWizard(
-        wizard.x,
-        wizard.y,
-        firstEnemyPositionsRef.current,
-        wizardShootStatus.firstWizards[index],
-        (shooted) =>
-          setWizardShootStatus((prev) => {
-            const newStatus = [...prev.firstWizards];
-            newStatus[index] = shooted;
-            return { ...prev, firstWizards: newStatus };
-          })
-      )
+    const firstWizards = createWizards(
+      gameState.firstWizards,
+      firstEnemyPositionsRef.current,
+      wizardShootStatus.firstWizards,
+      (shooted) =>
+        setWizardShootStatus((prev) => ({
+          ...prev,
+          firstWizards: [...prev.firstWizards, shooted],
+        }))
     );
 
-    const secondWizards = gameState.secondWizards.map((wizard, index) =>
-      AddWizard(
-        wizard.x,
-        wizard.y,
-        secondEnemyPositionsRef.current,
-        wizardShootStatus.secondWizards[index],
-        (shooted) =>
-          setWizardShootStatus((prev) => {
-            const newStatus = [...prev.secondWizards];
-            newStatus[index] = shooted;
-            return { ...prev, secondWizards: newStatus };
-          })
-      )
+    const secondWizards = createWizards(
+      gameState.secondWizards,
+      secondEnemyPositionsRef.current,
+      wizardShootStatus.secondWizards,
+      (shooted) =>
+        setWizardShootStatus((prev) => ({
+          ...prev,
+          secondWizards: [...prev.secondWizards, shooted],
+        }))
     );
 
     function animate() {
@@ -97,19 +91,17 @@ const MapRender = () => {
 
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-      firstEnemyPositionsRef.current.forEach((pos) => {
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        ctx.arc(pos.x + 5, pos.y + 5, 5, 0, 2 * Math.PI);
-        ctx.fill();
-      });
+      const drawEnemies = (enemies, ctx) => {
+        enemies.forEach((pos) => {
+          ctx.fillStyle = "red";
+          ctx.beginPath();
+          ctx.arc(pos.x + 5, pos.y + 5, 5, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+      };
 
-      secondEnemyPositionsRef.current.forEach((pos) => {
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        ctx.arc(pos.x + 5, pos.y + 5, 5, 0, 2 * Math.PI);
-        ctx.fill();
-      });
+      drawEnemies(firstEnemyPositionsRef.current, ctx);
+      drawEnemies(secondEnemyPositionsRef.current, ctx);
 
       firstPlayerTiles.forEach((tile) => {
         tile.update(ctx, mouse);
@@ -136,25 +128,6 @@ const MapRender = () => {
       animate();
     };
   }, [gameState, firstEnemyPositionsRef, secondEnemyPositionsRef, gameStart]);
-
-  useEffect(() => {
-    const handleGameStateUpdate = (gameState) => {
-      setGameState(gameState);
-    };
-
-    const handleGameStarted = () => {
-      setGameStart(true);
-    };
-
-    const socket = socketRef.current;
-    socket.on("gameState", handleGameStateUpdate);
-    socket.on("gameStarted", handleGameStarted);
-
-    return () => {
-      socket.off("gameState", handleGameStateUpdate);
-      socket.off("gameStarted", handleGameStarted);
-    };
-  }, [socketRef]);
 
   useEffect(() => {
     const handleCanvasClickWrapper = (event) => {
