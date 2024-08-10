@@ -94,10 +94,11 @@ export const AddWizard = (x, y, enemies, shooted, setShootStatus) => {
   const center = { x: x + width / 2, y: y + height / 2 };
   const radius = 100;
   let target;
+  console.log(enemies);
 
   let projectiles = [];
 
-  if (!shooted) {
+  if (!shooted && enemies.length > 0) {
     projectiles.push(Projectile(center.x, center.y, enemies));
     setShootStatus(true);
   }

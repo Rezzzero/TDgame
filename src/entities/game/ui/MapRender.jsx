@@ -33,6 +33,8 @@ const MapRender = () => {
   const [gameStart, setGameStart] = useState(false);
   const firstEnemyPositionsRef = useRef([]);
   const secondEnemyPositionsRef = useRef([]);
+  const firstTargetRef = useRef([]);
+  const secondTargetRef = useRef([]);
   useGameEvents(socketRef, setGameState, setGameStart);
 
   const firstPlayerTiles = GeneratePlacementTiles(
@@ -64,7 +66,7 @@ const MapRender = () => {
 
     const firstWizards = createWizards(
       gameState.firstWizards,
-      firstEnemyPositionsRef.current,
+      firstTargetRef.current,
       wizardShootStatus.firstWizards,
       (shooted) =>
         setWizardShootStatus((prev) => ({
@@ -75,7 +77,7 @@ const MapRender = () => {
 
     const secondWizards = createWizards(
       gameState.secondWizards,
-      secondEnemyPositionsRef.current,
+      secondTargetRef.current,
       wizardShootStatus.secondWizards,
       (shooted) =>
         setWizardShootStatus((prev) => ({
@@ -111,7 +113,7 @@ const MapRender = () => {
         tile.update(ctx, mouse);
       });
 
-      const drawWizards = (wizards, enemies, ctx) => {
+      const drawWizards = (wizards, enemies, ref, ctx) => {
         wizards.forEach((wizard) => {
           wizard.draw(ctx);
           wizard.target = null;
@@ -122,7 +124,8 @@ const MapRender = () => {
             const distance = Math.hypot(dx, dy);
             return distance < enemy.radius + wizard.radius * 0.7;
           });
-          console.log("valid enemies", validEnemies);
+          const updateRef = (validEnemies) => (ref.current = validEnemies);
+          updateRef(validEnemies);
 
           wizard.projectiles.forEach((projectile) => {
             projectile.update(ctx);
@@ -130,13 +133,20 @@ const MapRender = () => {
         });
       };
 
-      drawWizards(firstWizards, firstEnemyPositionsRef, ctx);
-      drawWizards(secondWizards, secondEnemyPositionsRef, ctx);
+      drawWizards(firstWizards, firstEnemyPositionsRef, firstTargetRef, ctx);
+      drawWizards(secondWizards, secondEnemyPositionsRef, secondTargetRef, ctx);
     }
     image.onload = () => {
       animate();
     };
-  }, [gameState, firstEnemyPositionsRef, secondEnemyPositionsRef, gameStart]);
+  }, [
+    gameState,
+    firstEnemyPositionsRef,
+    secondEnemyPositionsRef,
+    gameStart,
+    firstTargetRef,
+    secondTargetRef,
+  ]);
 
   useEffect(() => {
     const handleCanvasClickWrapper = (event) => {
