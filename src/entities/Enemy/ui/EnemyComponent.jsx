@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 export const createEnemy = (initialX, initialY, waypoints, speed) => {
   let x = initialX;
   let y = initialY;
-  let width = 10;
-  let height = 20;
+  const width = 10;
+  const height = 20;
   let waypointIndex = 0;
   let center = {
     x: x + width / 2,
     y: y + height / 2,
   };
+  const radius = 10;
 
   const update = () => {
     const waypoint = waypoints[waypointIndex];
@@ -32,10 +33,10 @@ export const createEnemy = (initialX, initialY, waypoints, speed) => {
       waypointIndex++;
     }
 
-    return { x, y, width, height, waypointIndex, center };
+    return { x, y, width, height, radius, waypointIndex, center };
   };
 
-  return { x, y, update };
+  return { x, y, radius, update };
 };
 
 export const EnemyComponent = ({ handleEnemies, waypoints, speed }) => {
@@ -59,7 +60,11 @@ export const EnemyComponent = ({ handleEnemies, waypoints, speed }) => {
         });
         setEnemies(updatedEnemies);
         handleEnemies(
-          updatedEnemies.map((enemy) => ({ x: enemy.x, y: enemy.y }))
+          updatedEnemies.map((enemy) => ({
+            x: enemy.x,
+            y: enemy.y,
+            radius: enemy.radius,
+          }))
         );
       }, 100);
 

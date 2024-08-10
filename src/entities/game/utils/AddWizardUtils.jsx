@@ -92,6 +92,8 @@ export const AddWizard = (x, y, enemies, shooted, setShootStatus) => {
   const width = 32 * 2;
   const height = 32;
   const center = { x: x + width / 2, y: y + height / 2 };
+  const radius = 100;
+  let target;
 
   let projectiles = [];
 
@@ -102,14 +104,19 @@ export const AddWizard = (x, y, enemies, shooted, setShootStatus) => {
 
   const draw = (ctx) => {
     ctx.fillStyle = "blue";
-    ctx.fillRect(x, y, width, height);
+    ctx.fillRect(x, y, width, height, 32);
+
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,0,255, 0.2)";
+    ctx.fill();
 
     projectiles.forEach((projectile) => {
       projectile.update(ctx);
     });
   };
 
-  return { x, y, projectiles, draw };
+  return { x, y, projectiles, radius, draw };
 };
 
 export const handleCanvasClick = (

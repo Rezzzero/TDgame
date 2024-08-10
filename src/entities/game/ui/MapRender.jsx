@@ -111,9 +111,18 @@ const MapRender = () => {
         tile.update(ctx, mouse);
       });
 
-      const drawWizards = (wizards, ctx) => {
+      const drawWizards = (wizards, enemies, ctx) => {
         wizards.forEach((wizard) => {
           wizard.draw(ctx);
+          wizard.target = null;
+
+          const validEnemies = enemies.current.filter((enemy) => {
+            const dx = enemy.x - wizard.x;
+            const dy = enemy.y - wizard.y;
+            const distance = Math.hypot(dx, dy);
+            return distance < enemy.radius + wizard.radius * 0.7;
+          });
+          console.log("valid enemies", validEnemies);
 
           wizard.projectiles.forEach((projectile) => {
             projectile.update(ctx);
@@ -121,8 +130,8 @@ const MapRender = () => {
         });
       };
 
-      drawWizards(firstWizards, ctx);
-      drawWizards(secondWizards, ctx);
+      drawWizards(firstWizards, firstEnemyPositionsRef, ctx);
+      drawWizards(secondWizards, secondEnemyPositionsRef, ctx);
     }
     image.onload = () => {
       animate();
